@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container my-5">
+
+    <!-- Checkout Heading -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-dark">Checkout</h1>
+        <p class="lead text-muted">Review your details and complete your purchase</p>
+        <hr class="w-25 mx-auto">
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+
+        <!-- LEFT: User + Shipping -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm p-4 rounded">
+
+                {% if user.is_authenticated %}
+                    <h5 class="text-primary"><strong>User Details</strong></h5>
+                    <p class="mb-1"><strong>Username:</strong> {{ user.username }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                {% endif %}
+
+                <hr>
+
+                {% if shipping_address %}
+                    <h5 class="text-primary"><strong>Shipping Address</strong></h5>
+                    <p><strong>Address:</strong> {{ shipping_address.address|default:"Not provided" }}</p>
+                    <p><strong>City:</strong> {{ shipping_address.city|default:"Not provided" }}</p>
+                    <p><strong>Region:</strong> {{ shipping_address.region|default:"Not provided" }}</p>
+                    <p><strong>Phone:</strong> {{ shipping_address.phone|default:"Not provided" }}</p>
+                {% else %}
+                    <div class="alert alert-info">No shipping address saved yet.</div>
+                {% endif %}
+
+                <form action="{% url 'shipping_address' %}" method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary w-100">Add / Update Shipping Address</button>
+                    
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-4 rounded">
+
+                <a class="btn btn-outline-secondary mb-3" href="{% url 'cart' %}">&#8592; Back to Cart</a>
+
+                <h5 class="text-primary"><strong>Order Summary</strong></h5>
+                <hr>
+
+                {% for item in items %}
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ item.product.imageURL }}" class="rounded me-3"  style="width: 70px; height: 70px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">{{ item.product.name }}</h6>
+                            <small class="text-muted">₵{{ item.product.price }} × {{ item.quantity }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                    <h6>Total Items:</h6>
+                    <h6>{{ cart.cart_total_items }}</h6>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <h5><strong>Total Price:</strong></h5>
+                    <h5 class="text-success"><strong>₵{{ cart.cart_total_price|floatformat:2 }}</strong></h5>
+                </div>
+
+                <form action="#" method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-lg w-100">Pay Now</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

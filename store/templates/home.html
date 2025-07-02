@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="container my-5 text-center">
+
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <h2 class="display-5 font-weight-bold text-dark">Welcome, {{ user.username }}!</h2>
+    {% else %}
+        <h2 class="display-5 font-weight-bold text-dark">Welcome, Guest!</h2>
+    {% endif %}
+    <p class="lead text-muted">Discover our latest products!</p>
+    <hr class="w-25 mx-auto">
+</div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info text-center" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text"><strong>Price:</strong> ₵{{ product.price }}</p>
+                        <a href="{% url 'product_detail' id=product.id %}" class="btn btn-sm btn-outline-secondary mb-2">View Details</a>
+                        <form action="{% url 'add_to_cart' id=product.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-primary btn-sm btn-block w-100">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center">No products available.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
