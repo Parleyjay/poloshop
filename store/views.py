@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Product, Category, Cart, CartItem, ShippingAddress, Customer
+from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-from .forms import ProductForm, CategoryForm
+from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm
 
 # FOR DISPLAYING THE PRODUCTS ON THE HOME PAGE
 def home(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
     context = {'products': products}
     return render(request, 'home.html', context)
 
@@ -84,6 +84,26 @@ def delete_category(request, id):
     context = {'category': category}
     return render(request, 'edit_category.html', context)
 
+
+
+
+#!!!!!!!!!!!!!!!!!!!! BRAND !!!!!!!!!!!!!!!!!!!
+
+def create_brand(request):
+    if request.method == 'POST':
+        form = BrandForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_product')
+    
+    else:
+        form = BrandForm()
+
+    context = {'form':form}
+    return render(request, 'create_brand.html', context)
+
+
+
 # PRODUCT FUNCTIONS
 
 def create_product(request):
@@ -93,18 +113,24 @@ def create_product(request):
 
     if request.method == 'POST':
         form = ProductForm(request.POST)
+        form = InventoryForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('home')
+            product = form.save(commit= False)
+            product.creator = request.user
+            product.save()
+            messages.success(request, 'Product created successfully.')
+            return redirect('create_inventory')
     else:
         form = ProductForm()
+        
 
     context = {'form': form}
     return render(request, 'create_product.html', context)
 
 def product_detail(request, id):
     product = Product.objects.get(id=id)
-    context = {'product': product}
+    reviews = Review.objects.filter(product=product).order_by('-created_date')
+    context = {'product': product, 'reviews': reviews}
     return render(request, 'product_detail.html', context)
 
 def edit_product(request, id):
@@ -136,6 +162,83 @@ def delete_product(request, id):
 
     context = {'product': product}
     return render(request, 'edit_product.html', context)
+
+
+
+
+#INVENTORY FUNCTION
+def create_inventory(request):
+    if request.method == 'POST':
+        form = InventoryForm(request.POST)
+        if form.is_valid():
+            inventory = form.save(commit=False)
+            inventory.creator = request.user
+            inventory.save()
+            messages.success(request, 'Inventory updated succesful')
+            return redirect('home')
+        
+    else:
+        form = InventoryForm(request.POST)
+    
+    context = {'form':form}
+    return render(request, 'create_inventory.html', context)
+
+
+
+# ADD SAVED PRODUCT
+def add_savedproduct(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    saved, created = SavedProducts.objects.get_or_create(user=request.user, product=product)
+
+    if created:
+        messages.success(request, f"'{product.name}' has been added to your saved products.")
+    else:
+        messages.info(request, f"'{product.name}' is already in your saved products.")
+
+    return redirect('product_detail', id=product.id)  # Make sure product_detail URL uses product_id
+
+
+# SAVED PRODUCTS LIST
+def saved_products_list(request):
+    saved_products = SavedProducts.objects.filter(user=request.user).select_related('product')
+    context = {'saved_products': saved_products}
+    return render(request, 'saved_products.html', context)
+
+
+# REMOVE SAVED PRODUCT
+def remove_savedproduct(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    SavedProducts.objects.filter(user=request.user, product=product).delete()
+    messages.success(request, f"'{product.name}' has been removed from your saved products.")
+    return redirect('saved_products')
+
+
+
+# REVIEW FUNCTION
+def add_review(request, id):
+    product = get_object_or_404(Product, pk=id)
+    
+    # Prevent multiple reviews by the same user
+    if Review.objects.filter(product=product, user=request.user).exists():
+        messages.info(request, "You have already reviewed this product.")
+        return redirect('product_detail', id=product.id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            messages.success(request, "Your review has been submitted.")
+            return redirect('product_detail', id=product.id)
+    else:
+        form = ReviewForm()
+            
+        
+    context = {'form':form, 'product':product}
+    return render(request, 'add_review.html', context)
+
 
 # CART FUNCTIONS
 
@@ -343,3 +446,9 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('home')
+
+
+def orders(request):
+    carts = Cart.objects.all()
+    context = {'carts': carts}
+    return render(request, 'orders.html', context)

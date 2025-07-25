@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<h1>Product Detail</h1>
+
+{% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -15,13 +25,32 @@
                     <p><strong>Price:</strong> <span class="text-success">₵{{ product.price }}</span></p>
                     <p><strong>Description:</strong> {{ product.description }}</p>
                     <p><strong>Category:</strong> {{ product.category }}</p>
+                    <p><strong>Brand:</strong> {{ product.brand }}</p>
+                    <p><strong>Status:</strong> {{ product.product_status }}</p>
+
+                    {% for review in reviews %}
+                    <h3><strong>Reviews</strong></h3>
+                    <hr>
+                    <p><strong>{{ review.user.username }}:</strong>
+                    {{ review.message }}</p>
+                    <p><strong>Rating:</strong>{{ review.rating}}/5</p>
+                    <p><small class="text-muted">Posted on {{ review.created_date }}</small></p>
+                    <hr>
+                    {% empty %}
+                    {% endfor %}
+
                     
+                        
+
                     {% if request.user.is_authenticated %}
                         {% if request.user.is_superuser or product.creator == request.user %}
                     <div class="mt-4 text-center">
                         <a href="{% url 'edit_product' id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Edit</a>
                         <a href="{% url 'delete_product' id=product.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
                     </div>
+                        {% else %}
+                        <a href="{% url 'add_saved_product' product_id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Save Product</a>
+                        <a href="{% url 'add_review' id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Review</a>
                         {% endif %}
                     {% endif %}
                 </div>

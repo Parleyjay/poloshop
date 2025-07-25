@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 
 
@@ -28,34 +30,107 @@ class Customer(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
      
     
     def __str__(self):
-        return f"{self.name} (created by {self.creator.username})" if self.creator else f"{self.name} (no creator)"
+        return f"{self.name}"
 
 
+
+class Brand(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f'{self.name}'
     
+
+
+class ProductStatus(models.Model):
+    status = models.CharField(max_length=50)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.status
     
+
+class ProductDocument(models.Model):
+    file_path = models.CharField(max_length=255)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file_path
 
 
 class Product(models.Model):
     name = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
-    #product_status = models.ForeignKey(ProductStatus, on_delete=models.CASCADE, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', null=True)
-    #brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True)
-    #product_document = models.ForeignKey(ProductDocument, on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products', null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, related_name='products', null=True)
+    product_status = models.ForeignKey(ProductStatus, on_delete=models.SET_NULL, null=True)
+    product_document = models.ForeignKey(ProductDocument, on_delete=models.SET_NULL, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    
-
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
     
 
+
+
+class InventoryStatus(models.Model):
+    status = models.CharField(max_length=50)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='inventory_status_created')
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.status
+
+
+
+
+class Inventory(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    status = models.ForeignKey(InventoryStatus, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='inventory_created')
+    modified_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank= True, null=True, related_name='inventory_modified')
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+
+
+class SavedProducts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+        indexes = [
+            models.Index(fields=['user', 'product']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.product.name}"
+
+
+
+
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
+    #created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='review_created_by')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} ({self.rating} stars)"
 
 
 

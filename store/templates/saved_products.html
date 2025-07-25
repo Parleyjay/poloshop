@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Saved Products</h2>
+
+{% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% if saved_products %}
+    <ul>
+        {% for saved in saved_products %}
+            <li>
+                {{ saved.product.name }} 
+                - <a href="{% url 'remove_saved_product' saved.product.id %}">Remove</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no saved products yet.</p>
+{% endif %}
+
+{% endblock %}

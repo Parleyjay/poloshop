@@ -12,12 +12,28 @@ urlpatterns = [
     path('category_detail/<int:id>/', views.category_detail, name='category_detail'),
     path('delete_category/<int:id>/', views.delete_category, name='delete_category'),
 
+    #BRAND URLS
+    path('create_brand', views.create_brand, name='create_brand'),
+
 
     #PRODUCT URLS
     path('create_product/', views.create_product, name='create_product'),
     path('product_detail/<int:id>', views.product_detail, name='product_detail'),
     path('edit/<int:id>/', views.edit_product, name='edit_product'),
     path('delete/<int:id>/', views.delete_product, name='delete_product'),
+
+    #INVENTORY URLS
+    path('create_inventory/', views.create_inventory, name='create_inventory'),
+
+    #SAVEDPRODUCT URLS
+    path('save_product/<int:product_id>/', views.add_savedproduct, name='add_saved_product'),
+    path('saved_products/', views.saved_products_list, name='saved_products'),
+    path('remove_savedproduct/<int:product_id>/', views.remove_savedproduct, name='remove_saved_product'),
+
+
+    #REVIEW URLS
+    path('add_review/<int:id>/', views.add_review, name='add_review'),
+
 
     #CART URLS
     path('cart/', views.cart, name='cart'),
@@ -28,7 +44,7 @@ urlpatterns = [
     path('shipping_address/', views.shipping_address, name='shipping_address'),
     
     
-
+    path('orders/', views.orders, name='orders'),
 
 
     #CUSTOMER URLS

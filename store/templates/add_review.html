@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Create Product</h1>
+<h1>Post Review</h1>
 
 
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
 
-    <button type="submit">Post Product</button>
+    <button type="submit">Post Review</button>
 
 </form>
 
