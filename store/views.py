@@ -113,13 +113,12 @@ def create_product(request):
 
     if request.method == 'POST':
         form = ProductForm(request.POST)
-        form = InventoryForm(request.POST)
         if form.is_valid():
             product = form.save(commit= False)
             product.creator = request.user
             product.save()
             messages.success(request, 'Product created successfully.')
-            return redirect('create_inventory')
+            return redirect('home')
     else:
         form = ProductForm()
         
@@ -358,7 +357,7 @@ def shipping_address(request):
         phone = request.POST.get('phone', '').strip()
 
         if not all([address, city, region, phone]):
-            messages.error(request, 'All fields are required.')
+            #messages.error(request, 'All fields are required.')
             return redirect('shipping_address')
 
         ShippingAddress.objects.update_or_create(

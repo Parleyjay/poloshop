@@ -68,6 +68,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products', null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, related_name='products', null=True)
     product_status = models.ForeignKey(ProductStatus, on_delete=models.SET_NULL, null=True)
+    image = models.ImageField(upload_to= 'products/', null=True, blank=True)
     product_document = models.ForeignKey(ProductDocument, on_delete=models.SET_NULL, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
