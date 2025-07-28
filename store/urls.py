@@ -26,13 +26,14 @@ urlpatterns = [
     path('create_inventory/', views.create_inventory, name='create_inventory'),
 
     #SAVEDPRODUCT URLS
-    path('save_product/<int:product_id>/', views.add_savedproduct, name='add_saved_product'),
+    path('save_product/<int:id>/', views.add_savedproduct, name='add_saved_product'),
     path('saved_products/', views.saved_products_list, name='saved_products'),
     path('remove_savedproduct/<int:product_id>/', views.remove_savedproduct, name='remove_saved_product'),
 
 
     #REVIEW URLS
     path('add_review/<int:id>/', views.add_review, name='add_review'),
+    path('remove_review/<int:id>/', views.remove_review, name='remove_review'),
 
 
     #CART URLS

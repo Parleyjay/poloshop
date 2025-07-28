@@ -185,8 +185,8 @@ def create_inventory(request):
 
 
 # ADD SAVED PRODUCT
-def add_savedproduct(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
+def add_savedproduct(request, id):
+    product = get_object_or_404(Product, id=id)
     saved, created = SavedProducts.objects.get_or_create(user=request.user, product=product)
 
     if created:
@@ -194,7 +194,7 @@ def add_savedproduct(request, product_id):
     else:
         messages.info(request, f"'{product.name}' is already in your saved products.")
 
-    return redirect('product_detail', id=product.id)  # Make sure product_detail URL uses product_id
+    return redirect('product_detail', id=id)  # Make sure product_detail URL uses product_id
 
 
 # SAVED PRODUCTS LIST
@@ -205,8 +205,8 @@ def saved_products_list(request):
 
 
 # REMOVE SAVED PRODUCT
-def remove_savedproduct(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
+def remove_savedproduct(request, id):
+    product = get_object_or_404(Product, id=id)
     SavedProducts.objects.filter(user=request.user, product=product).delete()
     messages.success(request, f"'{product.name}' has been removed from your saved products.")
     return redirect('saved_products')
@@ -215,12 +215,12 @@ def remove_savedproduct(request, product_id):
 
 # REVIEW FUNCTION
 def add_review(request, id):
-    product = get_object_or_404(Product, pk=id)
+    product = get_object_or_404(Product, id=id)
     
     # Prevent multiple reviews by the same user
     if Review.objects.filter(product=product, user=request.user).exists():
         messages.info(request, "You have already reviewed this product.")
-        return redirect('product_detail', id=product.id)
+        return redirect('product_detail', id=id)
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
@@ -230,13 +230,22 @@ def add_review(request, id):
             review.user = request.user
             review.save()
             messages.success(request, "Your review has been submitted.")
-            return redirect('product_detail', id=product.id)
+            return redirect('product_detail', id=id)
     else:
         form = ReviewForm()
             
         
     context = {'form':form, 'product':product}
     return render(request, 'add_review.html', context)
+
+
+def remove_review(request, id):
+    if request.method == 'POST':
+        review = get_object_or_404(Review, id=id, user=request.user)
+        review.delete()
+        messages.success(request, f"'{review.title}' has been deleted.")
+        return redirect('product_detail', id=review.product.id)
+
 
 
 # CART FUNCTIONS

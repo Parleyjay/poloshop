@@ -35,8 +35,11 @@
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                    {% if product.image %}    
+                    {% if product.image %}  
+                    <center>
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" height="100">
+                        <hr>
+                    </center>
                     {% else %}    
                         <p>No image available</p>
                     {% endif %}    
