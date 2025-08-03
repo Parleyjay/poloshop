@@ -63,7 +63,7 @@
 
                 {% for item in items %}
                     <div class="d-flex align-items-center mb-3">
-                        <img src="{{ item.product.imageURL }}" class="rounded me-3"  style="width: 70px; height: 70px; object-fit: cover;">
+                        <img src="{{ item.product.image.url }}" class="rounded me-3"  style="width: 70px; height: 70px; object-fit: cover;">
                         <div>
                             <h6 class="mb-0">{{ item.product.name }}</h6>
                             <small class="text-muted">₵{{ item.product.price }} × {{ item.quantity }}</small>

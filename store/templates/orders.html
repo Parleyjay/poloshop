@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>All Pending Orders Displayed Here</h1>
+{% for cart in carts %}
+    <li>{{ cart }}</li>
+    <hr>
+
+{% endfor %}
+
+{% endblock %}
