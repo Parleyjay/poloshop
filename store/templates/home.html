@@ -65,7 +65,11 @@
                     {% endif %} 
                         <h5 class="card-title">{{ product.name }}</h5>
                         <p class="card-text">GH₵{{ product.price }}</p>
-                        <a href="#" class="btn btn-primary u">Add to Cart</a>
+                         <a href="{% url 'product_detail' id=product.id %}" class="btn btn-sm btn-outline-secondary mb-2">View Details</a>
+                        <form action="{% url 'add_to_cart' id=product.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-primary btn-sm btn-block w-100">Add to Cart</button>
+                        </form>
                         </div>
                     </div>
                 </div>
