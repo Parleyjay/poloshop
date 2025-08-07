@@ -7,6 +7,18 @@ from django.contrib.auth.models import User
 
 from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm
 
+
+# !!!!!!!! STRIPE IMPORTS !!!!!!!
+
+import stripe
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+
+
+
+
 # FOR DISPLAYING THE PRODUCTS ON THE HOME PAGE
 def home(request):
     products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
@@ -341,7 +353,11 @@ def checkout(request):
         messages.error(request, 'Please login.')
         return redirect('login')
 
-    context = {'cart': cart, 'items': items, 'shipping_address': shipping_address}
+    context = {'cart': cart,
+            'items': items, 
+            'shipping_address': shipping_address,
+            'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
+            }
     return render(request, 'checkout.html', context)
 
 def shipping_address(request):
@@ -460,3 +476,100 @@ def orders(request):
     carts = Cart.objects.all()
     context = {'carts': carts}
     return render(request, 'orders.html', context)
+
+
+
+
+# !!!!!! STRIPE PAYMENT FUNCTIONALITY !!!!!!!!!!!
+
+# views.py
+from django.conf import settings
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from .models import Cart
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+@csrf_exempt
+@login_required
+def create_checkout_session(request):
+    print("Create Checkout Session Called")  # ✅ Debug line
+    if request.method == "POST":
+        customer = getattr(request.user, 'customer', None)
+        if not customer:
+            return JsonResponse({'error': 'Customer not found'}, status=400)
+
+        cart = Cart.objects.filter(customer=customer, complete=False).first()
+        if not cart:
+            return JsonResponse({'error': 'Cart not found'}, status=400)
+
+        line_items = []
+        for item in cart.cartitem_set.select_related('product').all():
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': item.product.name,
+                    },
+                    'unit_amount': int(item.product.price * 100),
+                },
+                'quantity': item.quantity,
+            })
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url='http://localhost:8000/payment-success/',
+                cancel_url='http://localhost:8000/payment-cancelled/',
+            )
+            return JsonResponse({'id': checkout_session.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return HttpResponse(status=405)
+
+
+
+def payment_success(request):
+    customer = getattr(request.user, 'customer', None)
+    if customer:
+        cart = Cart.objects.filter(customer=customer, complete=False).first()
+        if cart:
+            cart.complete = True
+            cart.save()
+    return render(request, 'payment_success.html')
+
+
+def payment_cancelled(request):
+    return render(request, 'payment_cancelled.html')
+
+
+def completed_order_view(request):
+    if not request.user.is_authenticated:
+        messages.error(request, 'You must be logged in to view your orders.')
+        return redirect('login')
+
+    customer = getattr(request.user, 'customer', None)
+    if not customer:
+        messages.error(request, 'No customer account found.')
+        return redirect('login')
+
+    # Get latest completed cart
+    completed_cart = Cart.objects.filter(customer=customer, complete=True).order_by('-id').first()
+    if not completed_cart:
+        messages.info(request, 'You have no completed orders.')
+        return render(request, 'order_complete.html', {'cart': None})
+
+    items = CartItem.objects.select_related('product').filter(cart=completed_cart)
+    shipping_address = ShippingAddress.objects.filter(customer=request.user, cart=completed_cart).first()
+
+    context = {
+        'cart': completed_cart,
+        'items': items,
+        'shipping_address': shipping_address,
+    }
+    return render(request, 'orders_complete.html', context)

@@ -47,6 +47,14 @@ urlpatterns = [
     
     path('orders/', views.orders, name='orders'),
 
+    # STRIPE URLS
+    path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
+    path('payment-success/', views.payment_success, name='payment_success'),
+    path('payment-cancelled/', views.payment_cancelled, name='payment_cancelled'),
+
+
+    path('order/complete/', views.completed_order_view, name='order_complete'),
+
 
     #CUSTOMER URLS
     path('register/', views.register, name='register'),
