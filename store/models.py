@@ -185,3 +185,28 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return f'{self.customer} address is  {self.address}'
 
+
+class OrderStatus(models.Model):
+    status = models.CharField(max_length=50, unique=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.status
+
+
+class Order(models.Model):
+    cart = models.OneToOneField('Cart', on_delete=models.CASCADE)  # one cart becomes one order
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True, blank=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True)  # linked to OrderStatus
+    payment_id = models.CharField(max_length=255, blank=True, null=True)  # Stripe or other payment reference
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def total_items(self):
+        return self.cart.cart_total_items
+
+    def __str__(self):
+        return f"Order {self.id} - {self.customer.username} ({self.status})"
