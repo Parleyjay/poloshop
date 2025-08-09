@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ order }}</h1>
+
+<div class="card mb-4">
+    <a href="{% url 'orders' %}">Back to Orders</a>
+    <div class="card-header">
+        <h2>Order Details</h2>
+    </div>
+    <div class="card-body">
+        {% if order %}
+            <h5 class="card-title">Order ID: {{ order.id }}</h5>
+            <p class="card-text"><strong>Order Date:</strong> {{ order.created_at }}</p>
+            <p class="card-text"><strong>Total:</strong> ₵{{ order.total_price }}</p>
+
+            <h5 class="mt-4">Shipping Address</h5>
+            {% if shipping_address %}
+                <p>{{ order.shipping_address.address }}</p>
+                    
+            {% else %}
+                <p>No shipping address provided.</p>
+            {% endif %}
+        {% else %}
+            <p>No order details available.</p>
+        {% endif %}
+    </div>
+
+
+{% endblock %}

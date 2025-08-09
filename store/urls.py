@@ -47,7 +47,8 @@ urlpatterns = [
     path('shipping_address/', views.shipping_address, name='shipping_address'),
     
     
-    path('orders/', views.orders, name='orders'),
+    path('orders/', views.all_orders, name='orders'),
+    path('order_detail/<int:id>/', views.order_detail, name='order_detail'),
 
     # STRIPE URLS
     path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
@@ -55,7 +56,7 @@ urlpatterns = [
     path('payment-cancelled/', views.payment_cancelled, name='payment_cancelled'),
 
 
-    path('order/complete/', views.completed_order_view, name='order_complete'),
+    path('order/complete/', views.completed_order_view, name='orders_complete'),
 
 
     #CUSTOMER URLS
