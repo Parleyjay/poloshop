@@ -577,23 +577,30 @@ def completed_order_view(request):
         messages.error(request, 'You must be logged in to view your orders.')
         return redirect('login')
 
-    customer = getattr(request.user, 'customer', None)
-    if not customer:
-        messages.error(request, 'No customer account found.')
-        return redirect('login')
-
-    # Get latest completed cart
-    completed_cart = Cart.objects.filter(customer=customer, complete=True).order_by('-id').first()
-    if not completed_cart:
+    # Get the latest order for this user
+    order = Order.objects.filter(customer=request.user).order_by('-id').first()
+    if not order:
         messages.info(request, 'You have no completed orders.')
-        return render(request, 'orders_complete.html', {'cart': None})
+        return render(request, 'orders_complete.html', {'order': None})
 
-    items = CartItem.objects.select_related('product').filter(cart=completed_cart)
-    shipping_address = ShippingAddress.objects.filter(customer=request.user, cart=completed_cart).first()
+    # Get items from the related cart
+    items = CartItem.objects.select_related('product').filter(cart=order.cart)
 
     context = {
-        'cart': completed_cart,
+        'order': order,
         'items': items,
-        'shipping_address': shipping_address,
+        'shipping_address': order.shipping_address,
     }
     return render(request, 'orders_complete.html', context)
+
+
+def all_orders(request):
+    orders = Order.objects.all().order_by('-created_at')
+    context = {'orders': orders}
+    return render(request, 'orders.html', context)
+
+def order_detail(request, id):
+    order = get_object_or_404(Order, id=id)
+    items = CartItem.objects.select_related('product').filter(cart=order.cart)
+    context = {'order': order, 'items': items}
+    return render(request, 'order_detail.html', context)

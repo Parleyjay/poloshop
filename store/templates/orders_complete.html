@@ -18,10 +18,10 @@
     </div>
     <div class="card-body">
 
-      {% if cart %}
-        <h5 class="card-title">Order ID: {{ cart.id }}</h5>
-        <p class="card-text"><strong>Order Date:</strong> {{ cart.created_at }}</p>
-        <p class="card-text"><strong>Total:</strong> ₵{{ cart.cart_total_price }}</p>
+      {% if order %}
+        <h5 class="card-title">Order ID: {{ order.id }}</h5>
+        <p class="card-text"><strong>Order Date:</strong> {{ order.created_at }}</p>
+        <p class="card-text"><strong>Total:</strong> ₵{{ order.total_price }}</p>
 
         <h5 class="mt-4">Shipping Address</h5>
         {% if shipping_address %}
