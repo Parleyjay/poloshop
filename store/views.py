@@ -4,6 +4,8 @@ from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from datetime import datetime, date
+
 
 from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm
 
@@ -15,6 +17,16 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
+#global variables
+currentYear = datetime.now().strftime("%Y")
+currentDate = datetime.today().strftime("%Y-%m-%d")
+
+currentTimestamp = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+
+
+
+
+
 
 
 
@@ -22,8 +34,16 @@ from django.conf import settings
 # FOR DISPLAYING THE PRODUCTS ON THE HOME PAGE
 def home(request):
     products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
-    context = {'products': products}
+    context = {"currentYear": currentYear,
+               'products': products}
     return render(request, 'home.html', context)
+
+
+def account_detail(request):
+    context = {"currentYear": currentYear,
+               }
+    return render(request,'account_detail.html',context)
+    
 
 # CATEGORY FUNCTIONS
 
