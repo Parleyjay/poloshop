@@ -71,7 +71,7 @@ def edit_category(request, id):
     context = {'category': category, 'form': form}
     return render(request, 'edit_category.html', context)
 
-@login_required(login_url="login") 
+ 
 def all_category(request):
     categories = Category.objects.all()
     context = {'categories': categories}
@@ -82,7 +82,7 @@ def all_category(request):
 def category_context(request):
     return {'categories': Category.objects.all()}
 
-@login_required(login_url="login") 
+ 
 def category_detail(request, id):
     category = Category.objects.get(id=id)
     products = category.products.all()
@@ -145,7 +145,7 @@ def create_product(request):
     context = {'form': form}
     return render(request, 'create_product.html', context)
 
-@login_required(login_url="login") 
+
 def product_detail(request, id):
     product = Product.objects.get(id=id)
     reviews = Review.objects.filter(product=product).order_by('-created_date')
