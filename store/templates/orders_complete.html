@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
 <div class="container mt-5">
+    <a class="btn btn-outline-dark" href="{% url 'home' %}">&#x2190; Continue Shopping</a>
   <div class="card">
     <div class="card-header bg-success text-white">
       <h3>Completed Order Summary</h3>

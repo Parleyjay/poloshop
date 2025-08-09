@@ -55,7 +55,7 @@ urlpatterns = [
     path('payment-cancelled/', views.payment_cancelled, name='payment_cancelled'),
 
 
-    path('order/complete/', views.completed_order_view, name='order_complete'),
+    path('order/complete/', views.completed_order_view, name='orders_complete'),
 
 
     #CUSTOMER URLS

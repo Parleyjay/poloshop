@@ -586,7 +586,7 @@ def completed_order_view(request):
     completed_cart = Cart.objects.filter(customer=customer, complete=True).order_by('-id').first()
     if not completed_cart:
         messages.info(request, 'You have no completed orders.')
-        return render(request, 'order_complete.html', {'cart': None})
+        return render(request, 'orders_complete.html', {'cart': None})
 
     items = CartItem.objects.select_related('product').filter(cart=completed_cart)
     shipping_address = ShippingAddress.objects.filter(customer=request.user, cart=completed_cart).first()
