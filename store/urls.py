@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     #path('', views.test, name='test'),
     path('', views.home, name='home'),
+    
+    
     #CATEGORY URLS
     path('create_category/', views.create_category, name='create_category'),
     path('edit_category/<int:id>/', views.edit_category, name='edit_category'),
