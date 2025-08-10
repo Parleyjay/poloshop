@@ -46,16 +46,21 @@
                     <p><strong>City:</strong> {{ shipping_address.city|default:"Not provided" }}</p>
                     <p><strong>Region:</strong> {{ shipping_address.region|default:"Not provided" }}</p>
                     <p><strong>Phone:</strong> {{ shipping_address.phone|default:"Not provided" }}</p>
+
+                <a href="{% url 'edit_address' shipping_address.id %}" class="btn btn-outline-primary w-100 mt-3">Update Shipping Address</a>
+                
                 {% else %}
                     <div class="alert alert-info">No shipping address saved yet.</div>
+
+                    <form action="{% url 'shipping_address' %}" method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary w-100">Add Shipping Address</button>
+                    
+                    </form>
                 {% endif %}
 
-                <form action="{% url 'shipping_address' %}" method="POST" class="mt-4">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary w-100">Add / Update Shipping Address</button>
-                    
-
-                </form>
+                
+                
 
             </div>
         </div>

@@ -674,3 +674,5 @@ def order_detail(request, id):
     items = CartItem.objects.select_related('product').filter(cart=order.cart)
     context = {'order': order, 'items': items}
     return render(request, 'order_detail.html', context)
+
+
