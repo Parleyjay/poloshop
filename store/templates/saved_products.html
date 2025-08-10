@@ -1,26 +1,24 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Your Saved Products</h2>
-
-{% if messages %}
-        <div class="alert alert-danger">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-{% if saved_products %}
-    <ul>
-        {% for saved in saved_products %}
-            <li>
-                {{ saved.product.name }} 
-                - <a href="{% url 'remove_saved_product' saved.product.id %}">Remove</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You have no saved products yet.</p>
-{% endif %}
-
+{% extends "base.html" %} 
+{% block content %} 
+  <h4 class="mb-4" style="margin: 20px;">Your Saved Products</h4> 
+  {% if messages %} 
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {% for message in messages %} 
+        {{ message }} 
+      {% endfor %} 
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div> 
+  {% endif %} 
+  {% if saved_products %} 
+    <div class="list-group">
+      {% for saved in saved_products %} 
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          {{ saved.product.name }} 
+          <a href="{% url 'remove_saved_product' saved.product.id %}" class="btn btn-sm btn-danger">Remove</a>
+        </div> 
+      {% endfor %} 
+    </div> 
+  {% else %} 
+    <p class="text-muted">You have no saved products yet.</p> 
+  {% endif %} 
 {% endblock %}

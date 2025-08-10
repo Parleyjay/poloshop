@@ -1,4 +1,5 @@
 {% load static%}
+{% load widget_tweaks %}
 <!doctype html>
 
 
@@ -43,7 +44,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-    <title> McDora</title>
+    <title>{% block title %}{% endblock title %}</title> 
   </head>
   <body style="background-color: #F9F5FF;">
 
@@ -166,9 +167,20 @@
   </body>
 
 
-  <div class="footer" style="display: flex; justify-content: space-between;">
-  <p>&copy; {{ currentYear }} McDora</p>
-  <p style="color:darkblue"> Powered by Exon Labs</p>
-</div>
+
+<footer class="footer fixed-bottom py-3 bg-white">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6 text-md-start">
+        <p class="mb-0">&copy; {{ currentYear }} McDora</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <p class="mb-0" style="color: #03055B;">Powered by Exon Labs</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
 
 </html>

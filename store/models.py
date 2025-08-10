@@ -171,6 +171,7 @@ class CartItem(models.Model):
 
 
 class ShippingAddress(models.Model):
+    # customer= models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     customer= models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=200, null=False)
@@ -198,11 +199,14 @@ class Order(models.Model):
     cart = models.OneToOneField('Cart', on_delete=models.CASCADE)  # one cart becomes one order
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True, blank=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True)  # linked to OrderStatus
     payment_id = models.CharField(max_length=255, blank=True, null=True)  # Stripe or other payment reference
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def total_price(self):
+        return self.cart.cart_total_price
 
     @property
     def total_items(self):

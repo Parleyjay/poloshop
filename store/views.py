@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from datetime import datetime, date
 
 
-from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm
+from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm,ShippingAddressForm
 
 
 # !!!!!!!! STRIPE IMPORTS !!!!!!!
@@ -34,15 +34,29 @@ currentTimestamp = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
 # FOR DISPLAYING THE PRODUCTS ON THE HOME PAGE
 def home(request):
     products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
+  
+    
     context = {"currentYear": currentYear,
                'products': products}
     return render(request, 'home.html', context)
 
 
+    
+@login_required(login_url="login")
 def account_detail(request):
-    context = {"currentYear": currentYear,
-               }
-    return render(request,'account_detail.html',context)
+    try:
+        addresses = ShippingAddress.objects.filter(customer=request.user)
+        # print(addresses)
+        context = {
+            "currentYear": currentYear,
+            "addresses": addresses,
+        }
+        return render(request, 'account_detail.html', context)
+    except Exception as e:
+        return render(request, 'error.html', {'error': str(e)})
+
+
+
     
 
 # CATEGORY FUNCTIONS
@@ -400,6 +414,7 @@ def checkout(request):
             }
     return render(request, 'checkout.html', context)
 
+
 @login_required(login_url="login") 
 def shipping_address(request):
     if not request.user.is_authenticated:
@@ -441,6 +456,41 @@ def shipping_address(request):
         return redirect('checkout')
 
     return render(request, 'shipping_address.html')
+
+
+
+
+@login_required(login_url="login")
+def edit_address(request, id):
+    print("Edit address view function called")
+    try:
+        address = ShippingAddress.objects.get(id=id)
+        print(f"Address customer: {address.customer}, Request user: {request.user}")
+        if address.customer != request.user:
+            print("Customer and user do not match")
+            messages.error(request, 'You are not authorized to edit this address.')
+            return redirect('account_detail')
+
+        if request.method == 'POST':
+            form = ShippingAddressForm(request.POST, instance=address)
+            if form.is_valid():
+                form.save()
+                return redirect('account_detail')
+        else:
+            form = ShippingAddressForm(instance=address)
+
+        context = {'address': address, 'form': form}
+        return render(request, 'edit_address.html', context)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        messages.error(request, 'An error occurred.')
+        return redirect('account_detail')
+
+
+
+
+
+
 
 # USER FUNCTIONS
 
