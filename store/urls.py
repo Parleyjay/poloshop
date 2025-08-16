@@ -68,7 +68,8 @@ urlpatterns = [
     path('account_detail/', views.account_detail, name='account_detail'),
     
     
-     path('edit_address/<int:id>/', views.edit_address, name='edit_address'),
+    path('edit_address/<int:id>/', views.edit_address, name='edit_address'),
+    
 
 
 
