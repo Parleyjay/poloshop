@@ -10,23 +10,6 @@ from datetime import datetime, date
 from .forms import ProductForm, CategoryForm, BrandForm, InventoryForm, ReviewForm,ShippingAddressForm
 
 
-# !!!!!!!! STRIPE IMPORTS !!!!!!!
-
-import stripe
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-
-#global variables
-currentYear = datetime.now().strftime("%Y")
-currentDate = datetime.today().strftime("%Y-%m-%d")
-
-currentTimestamp = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-
-
-
-
-
 
 
 
@@ -36,7 +19,7 @@ def home(request):
     products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
   
     
-    context = {"currentYear": currentYear,
+    context = {
                'products': products}
     return render(request, 'home.html', context)
 
@@ -48,7 +31,7 @@ def account_detail(request):
         addresses = ShippingAddress.objects.filter(customer=request.user)
         # print(addresses)
         context = {
-            "currentYear": currentYear,
+            
             "addresses": addresses,
         }
         return render(request, 'account_detail.html', context)
@@ -409,8 +392,8 @@ def checkout(request):
 
     context = {'cart': cart,
             'items': items, 
-            'shipping_address': shipping_address,
-            'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
+            'shipping_address': shipping_address
+            
             }
     return render(request, 'checkout.html', context)
 
@@ -574,57 +557,9 @@ def orders(request):
 
 
 
-# !!!!!! STRIPE PAYMENT FUNCTIONALITY !!!!!!!!!!!
-
-# views.py
-from django.conf import settings
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from .models import Cart
-import stripe
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-@csrf_exempt
-@login_required
-def create_checkout_session(request):
-    print("Create Checkout Session Called")  # ✅ Debug line
-    if request.method == "POST":
-        customer = getattr(request.user, 'customer', None)
-        if not customer:
-            return JsonResponse({'error': 'Customer not found'}, status=400)
 
-        cart = Cart.objects.filter(customer=customer, complete=False).first()
-        if not cart:
-            return JsonResponse({'error': 'Cart not found'}, status=400)
-
-        line_items = []
-        for item in cart.cartitem_set.select_related('product').all():
-            line_items.append({
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': item.product.name,
-                    },
-                    'unit_amount': int(item.product.price * 100),
-                },
-                'quantity': item.quantity,
-            })
-
-        try:
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=line_items,
-                mode='payment',
-                success_url='http://localhost:8000/payment-success/',
-                cancel_url='http://localhost:8000/payment-cancelled/',
-            )
-            return JsonResponse({'id': checkout_session.id})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    return HttpResponse(status=405)
 
 
 
