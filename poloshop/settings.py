@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Stripe keys from environment
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
-STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+# PAYSTACK KEYS
+# PAYSTACK_SECRET_KEY = "sk_test_"
+# PAYSTACK_PUBLIC_KEY = "pk_test_"
 
 
 

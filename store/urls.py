@@ -51,7 +51,7 @@ urlpatterns = [
     path('order_detail/<int:id>/', views.order_detail, name='order_detail'),
 
     # STRIPE URLS
-    path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
+    # path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
     path('payment-success/', views.payment_success, name='payment_success'),
     path('payment-cancelled/', views.payment_cancelled, name='payment_cancelled'),
 

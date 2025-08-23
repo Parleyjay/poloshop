@@ -110,31 +110,6 @@
 
 </div>
 
-<script>
-  const stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
-
-  document.getElementById("checkout-button").addEventListener("click", function () {
-    fetch("{% url 'create_checkout_session' %}", {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": "{{ csrf_token }}",
-        "Content-Type": "application/json"
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.id) {
-        stripe.redirectToCheckout({ sessionId: data.id });
-      } else if (data.error) {
-        alert(data.error);
-      }
-    })
-    .catch(error => {
-      console.error("Checkout error:", error);
-    });
-  });
-</script>
-
 
 
 

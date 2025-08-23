@@ -18,8 +18,15 @@ admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Customer)
 admin.site.register(ShippingAddress)
+admin.site.register(API)
+admin.site.register(PaymentMethod)
+admin.site.register(Transaction)
 admin.site.register(OrderStatus)
 admin.site.register(Order)
+
+admin.site.register(DeliveryMethod)
+admin.site.register(DeliveryStatus)
+admin.site.register(Delivery)
 
 #
 

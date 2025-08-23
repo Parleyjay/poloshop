@@ -185,6 +185,39 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return f'{self.customer} address is  {self.address}'
+    
+
+class API(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
+    key = models.CharField(max_length=200, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return self.name
+
+
+
+class PaymentMethod(models.Model):
+    method = models.CharField(max_length=100, null=True)
+    APIkey = models.ForeignKey(API, on_delete=models.SET_NULL, null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.method
+    
+
+
+class Transaction(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.IntegerField()  # store amount in pesewas (i.e. multiply GHS by 100)
+    reference = models.CharField(max_length=100, unique=True)
+    verified = models.BooleanField(default=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.customer} - {self.amount/100} GHS"
+
 
 
 class OrderStatus(models.Model):
@@ -198,9 +231,9 @@ class OrderStatus(models.Model):
 class Order(models.Model):
     cart = models.OneToOneField('Cart', on_delete=models.CASCADE)  # one cart becomes one order
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    payment = models.ForeignKey(Transaction, on_delete=models.SET_NULL, null=True)  # Paystack or other payment reference
     shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True, blank=True)
     status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True)  # linked to OrderStatus
-    payment_id = models.CharField(max_length=255, blank=True, null=True)  # Stripe or other payment reference
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -214,3 +247,21 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.customer.username} ({self.status})"
+    
+
+
+class DeliveryMethod(models.Model):
+    mode = models.CharField(max_length=100, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class DeliveryStatus(models.Model):
+    status = models.CharField(max_length=100, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Delivery(models.Model):
+    delivery_method = models.ForeignKey(DeliveryMethod, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.ForeignKey(DeliveryStatus, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
