@@ -1,0 +1,25 @@
+{% extends 'base.html' %} 
+{% load bootstrap %}
+
+{% block title %}Edit Address Details{% endblock %} 
+{% block content %} 
+  <div class="container"> 
+    <div class="row justify-content-center"> 
+      <div class="col-md-6"> 
+        <div class="card border-0"> 
+          <div class="card-header"><strong>Edit Address</strong></div> 
+          <div class="card-body"> 
+            <form method="post"> 
+              {% csrf_token %} 
+              {% comment %} {{ form.as_p }}  {% endcomment %}
+              {{form|bootstrap}}
+             
+              <button type="submit" class="btn btn-primary" style="margin:20px">Save Changes</button> 
+              <a href="{% url 'account_detail' %}" class="btn btn-secondary">Cancel</a> 
+            </form> 
+          </div> 
+        </div> 
+      </div> 
+    </div> 
+  </div> 
+{% endblock %}

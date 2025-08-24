@@ -1,34 +1,50 @@
 {% extends 'base.html' %}
+
+
 {% block content %}
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+{% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
 
-            <!-- Product Card -->
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body">
-                    <h2 class="card-title text-center text-primary mb-4">{{ product.name }}</h2>
-                    
-                    <hr>
-                    
-                    <p><strong>Price:</strong> <span class="text-success">₵{{ product.price }}</span></p>
-                    <p><strong>Description:</strong> {{ product.description }}</p>
-                    <p><strong>Category:</strong> {{ product.category }}</p>
-                    
-                    {% if request.user.is_authenticated %}
-                        {% if request.user.is_superuser or product.creator == request.user %}
-                    <div class="mt-4 text-center">
-                        <a href="{% url 'edit_product' id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Edit</a>
-                        <a href="{% url 'delete_product' id=product.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
-                    </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
+
+<div class="container-fluid w-100" style="padding-top: 20px;">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="card p-3 border-0">
             </div>
-
         </div>
+        {% if product.image %} 
+        <div class="col-md-6">
+            <div class="card p-3 mb-3 border-0">
+                <div class="card text-bg-dark">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}>
+                    </center>" class="card-img" alt="...">
+                    <div class="card-img-overlay">
+                    </div>
+                    </div>
+                
+            </div>
+        </div>
+
+        <div class="col-md-4">
+                <div class="card p-3 mb-3 border-0">
+                    
+                <h4> {{ product.name }}</h4>
+                <p>Gh₵{{ product.price }}</p>
+                <p>{{ product.description }}</p>
+                <p><strong>Brand:</strong> {{ product.brand }}</p>
+                <p>{{ product.product_status }}</p>
+                <a href="{% url 'add_saved_product' id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Add to Cart</a>
+                </div>
+                {%endif%}
+            </div>
+        </div>
+
     </div>
 </div>
-
 {% endblock %}
