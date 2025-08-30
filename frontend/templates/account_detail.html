@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Details{% endblock%}
+
+{% block content %}
+<div class="container-fluid w-100" style="padding-top: 20px;">
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card p-3 border-0">
+        <div class="card-header">
+        <p>Menu</p></div>
+           <ul class="list-group list-group-flush"> 
+                    <li class="list-group-item">
+                        <a href="{% url 'account_detail' %}" class="text-decoration-none text-dark">My Account</a>
+                    </li> 
+                    <li class="list-group-item">
+                        <a href="{% url 'orders_complete' %}" class="text-decoration-none text-dark">My Orders</a>
+                    </li> 
+                    <li class="list-group-item">
+                        <a href="{% url 'saved_products' %}" class="text-decoration-none text-dark">My Saved Products</a>
+                    </li> 
+                    <li class="list-group-item">
+                        <a href="#" class="text-decoration-none text-dark">My Notifications</a>
+                    </li> 
+                    <li class="list-group-item">
+               <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+
+                    </li> 
+                    </ul>
+
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="card p-3 mb-3 border-0">
+        
+       <h3>Hello, {{ user.username }}</h3>
+       <p>You can view and make changes to our account here.</p>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card border-0">
+            <div class="card-header"><strong>
+                Profile</strong>
+            </div>
+            <div class="card-body">
+                
+                <p class="card-text">{{ user.first_name}} {{user.last_name}}</p>
+                <p class="card-text">{{user.email}}</p>
+                    
+                <a href="#" class="btn btn-primary">Edit</a>
+            </div>
+            </div>
+        </div>
+            <div class="col-md-6">
+            <div class="card border-0">
+                <div class="card-header"><strong>Addresses</strong></div>
+                <div class="card-body">
+                <p><strong>Your default address is:</strong></p>
+                {% for address in addresses %}
+                    <p>
+                    {{ address.address }}<br>
+                    {{ address.region }} <br>
+                    {{ address.city }}<br>
+                    {{ address.phone }}
+                    </p>
+                    <a href="{% url 'edit_address' address.id %}" class="btn btn-primary">Edit This Address</a>
+                    
+                    <hr>
+                {% empty %}
+                    <p>No addresses found.</p>
+                {% endfor %}
+                <a href="{% url 'shipping_address' %}" class="btn btn-primary">Add Address</a>
+                </div>
+            </div>
+            </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+{% endblock content %}

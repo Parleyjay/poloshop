@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+{% block title %}Edit Category{% endblock%}
+
+
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Make changes</button>
+</form>
+
+{% endblock content %}

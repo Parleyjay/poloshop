@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>All Pending Orders Displayed Here</h1>
+{% for order in orders %}
+    <li><a href="{% url 'order_detail' id=order.id %}">{{ order }}</a></li>
+    <hr>
+
+{% endfor %}
+
+{% endblock %}

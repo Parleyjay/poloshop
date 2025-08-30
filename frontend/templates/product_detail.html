@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+<div class="container-fluid w-100" style="padding-top: 20px;">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="card p-3 border-0">
+            </div>
+        </div>
+        {% if product.image %} 
+        <div class="col-md-6">
+            <div class="card p-3 mb-3 border-0">
+                <div class="card text-bg-dark">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}>
+                    </center>" class="card-img" alt="...">
+                    <div class="card-img-overlay">
+                    </div>
+                    </div>
+                
+            </div>
+        </div>
+
+        <div class="col-md-4">
+                <div class="card p-3 mb-3 border-0">
+                    
+                <h4> {{ product.name }}</h4>
+                <p>Gh₵{{ product.price }}</p>
+                <p>{{ product.description }}</p>
+                <p><strong>Brand:</strong> {{ product.brand }}</p>
+                <p>{{ product.product_status }}</p>
+                <a href="{% url 'add_saved_product' id=product.id %}" class="btn btn-outline-primary btn-sm me-2">Add to Cart</a>
+                </div>
+                {%endif%}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
