@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2']
 # Application definition
 
 INSTALLED_APPS = [
-    'store',
+    # 'store',
     'rest_framework',
     'corsheaders',
     'rest_framework.authtoken',
@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks', 
     'bootstrapform',
+    'frontend',
+    'backend',
 ]
 
 REST_FRAMEWORK = {
@@ -108,6 +110,22 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+#MySQL Server
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'poloshop_db',
+#         'USER': 'yme',
+#         'PASSWORD': 'Password@123',
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#     }
+# }
+
+
+
 
 
 # Password validation
