@@ -1,112 +1,125 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField  # or use models.JSONField for Django 3.1+
 
-# -REFERENCE TABLES -
+
+# ==
+# REFERENCE TABLES
+# ==
 
 class UserType(models.Model):
-    user_type = models.CharField(max_length=50)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user_type = models.CharField(max_length=50, db_column='UserType')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'UserType'
 
     def __str__(self):
-        return self.user_type
+        return self.user_type or f"UserType {self.id}"
 
 
 class UserStatus(models.Model):
-    status = models.CharField(max_length=10)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(null=True, blank=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    status = models.CharField(max_length=10, db_column='Status')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'UserStatus'
 
     def __str__(self):
-        return self.status
+        return self.status or f"UserStatus {self.id}"
 
 
 class Country(models.Model):
-    name = models.CharField(max_length=100)
-    country_code = models.CharField(max_length=5, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(null=True, blank=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    country_code = models.CharField(max_length=5, db_column='CountryCode', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Country'
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.country_code})"
 
 
 class Currency(models.Model):
-    name = models.CharField(max_length=10)
-    country = models.ForeignKey(Country, on_delete=models.DO_NOTHING, null=True, blank=True)
-    currency_code = models.CharField(max_length=10, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=10, db_column='Name')
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='CountryId', blank=True, null=True)
+    currency_code = models.CharField(max_length=10, db_column='CurrencyCode', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Currency'
 
     def __str__(self):
-        return self.name
+        return self.currency_code
 
 
 class Region(models.Model):
-    name = models.CharField(max_length=100)
-    region_code = models.CharField(max_length=10, unique=True)
-    country = models.ForeignKey(Country, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    region_code = models.CharField(max_length=10, db_column='RegionCode', unique=True, blank=True, null=True)
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='CountryId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Region'
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.region_code})" if self.region_code else self.name
 
 
 class AddressType(models.Model):
-    type = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    type = models.CharField(max_length=100, db_column='Type', unique=True, blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'AddressType'
 
     def __str__(self):
-        return self.type
+        return self.type or f"AddressType {self.id}"
 
 
 class CategoryType(models.Model):
-    category = models.CharField(max_length=100)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    category = models.CharField(max_length=100, db_column='Category')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'CategoryType'
+        constraints = [
+            models.UniqueConstraint(fields=['category'], name='uq_categorytype_category'),
+        ]
 
     def __str__(self):
         return self.category
 
 
 class Brand(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -117,9 +130,10 @@ class Brand(models.Model):
 
 
 class DeliveryMode(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -130,9 +144,10 @@ class DeliveryMode(models.Model):
 
 
 class Status(models.Model):
-    status = models.CharField(max_length=50)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    status = models.CharField(max_length=50, db_column='Status')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -143,10 +158,11 @@ class Status(models.Model):
 
 
 class API(models.Model):
-    name = models.CharField(max_length=100)
-    key = models.CharField(max_length=500)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    key = models.CharField(max_length=500, db_column='Key')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -157,23 +173,28 @@ class API(models.Model):
 
 
 class PaymentMethod(models.Model):
-    method = models.CharField(max_length=100)
-    api_key = models.ForeignKey(API, on_delete=models.DO_NOTHING, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    method = models.CharField(max_length=100, db_column='Method')
+    api_key = models.ForeignKey(API, models.DO_NOTHING, db_column='APIKeyId', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'PaymentMethod'
+        constraints = [
+            models.UniqueConstraint(fields=['method'], name='uq_paymentmethod_method'),
+        ]
 
     def __str__(self):
         return self.method
 
 
 class Sender(models.Model):
-    sender_address = models.CharField(max_length=255)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    sender_address = models.CharField(max_length=255, db_column='SenderAddress')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -184,9 +205,10 @@ class Sender(models.Model):
 
 
 class NotificationType(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -197,26 +219,28 @@ class NotificationType(models.Model):
 
 
 class NotificationTemplate(models.Model):
-    message = models.TextField()
-    subject = models.CharField(max_length=200, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    message = models.TextField(db_column='Message')
+    subject = models.CharField(max_length=200, db_column='Subject', blank=True, null=True)
+    is_active = models.BooleanField(db_column='IsActive', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'NotificationTemplate'
 
     def __str__(self):
-        return f"{self.subject or 'Template'}"
+        return self.subject or f"Template {self.id}"
 
 
 class GeneralSetup(models.Model):
-    name = models.CharField(max_length=100)
-    value = models.IntegerField(null=True, blank=True)
-    description = models.CharField(max_length=50, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    value = models.IntegerField(db_column='Value', blank=True, null=True)
+    description = models.CharField(max_length=50, db_column='Description', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -226,170 +250,298 @@ class GeneralSetup(models.Model):
         return self.name
 
 
-
-
-# ------------------ MAIN ENTITY TABLES ------------------
+# =========================
+# MAIN ENTITY TABLES
+# =========================
 
 class Users(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    other_name = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(unique=True)
-    phone_no = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    user_type = models.ForeignKey(UserType, on_delete=models.DO_NOTHING)
-    user_status = models.ForeignKey(UserStatus, on_delete=models.DO_NOTHING)
-    password_hash = models.BinaryField()
-    last_login_date = models.DateTimeField(null=True, blank=True)
-    failed_login_attempts = models.IntegerField(default=0)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    first_name = models.CharField(max_length=100, db_column='FirstName')
+    last_name = models.CharField(max_length=100, db_column='LastName')
+    other_name = models.CharField(max_length=100, db_column='OtherName', blank=True, null=True)
+    email = models.EmailField(max_length=255, db_column='Email', unique=True)
+    phone_no = models.CharField(max_length=20, db_column='PhoneNo', unique=True, blank=True, null=True)
+    user_type = models.ForeignKey(UserType, models.DO_NOTHING, db_column='UserTypeId')
+    user_status = models.ForeignKey(UserStatus, models.DO_NOTHING, db_column='UserStatusId')
+    password_hash = models.BinaryField(db_column='PasswordHash')
+    last_login_date = models.DateTimeField(db_column='LastLoginDate', blank=True, null=True)
+    failed_login_attempts = models.IntegerField(db_column='FailedLoginAttempts', default=0)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Users'
+        indexes = [
+            models.Index(fields=['user_type'], name='idx_users_usertype'),
+            models.Index(fields=['user_status'], name='idx_users_userstatus'),
+        ]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        # use user id when name not provided; rely on fields only (avoid joining FKs)
+        return f"{self.first_name} {self.last_name} (#{self.id})"
 
 
 class Address(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    country = models.ForeignKey(Country, on_delete=models.DO_NOTHING)
-    region = models.ForeignKey(Region, on_delete=models.DO_NOTHING)
-    city = models.CharField(max_length=200, null=True, blank=True)
-    address_type = models.ForeignKey(AddressType, on_delete=models.DO_NOTHING)
-    digital_address = models.CharField(max_length=100, null=True, blank=True)
-    street_name = models.CharField(max_length=200, null=True, blank=True)
-    is_default = models.BooleanField(default=False)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey(Users, models.DO_NOTHING, db_column='UserId')
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='CountryId')
+    region = models.ForeignKey(Region, models.DO_NOTHING, db_column='RegionId')
+    city = models.CharField(max_length=200, db_column='City', blank=True, null=True)
+    address_type = models.ForeignKey(AddressType, models.DO_NOTHING, db_column='AddressTypeId')
+    digital_address = models.CharField(max_length=100, db_column='DigitalAddress', blank=True, null=True)
+    street_name = models.CharField(max_length=200, db_column='StreetName', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+    is_default = models.BooleanField(db_column='IsDefault', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Address'
+        indexes = [
+            models.Index(fields=['user'], name='idx_address_user'),
+            models.Index(fields=['country'], name='idx_address_country'),
+            models.Index(fields=['region'], name='idx_address_region'),
+            models.Index(fields=['address_type'], name='idx_address_addresstype'),
+        ]
 
     def __str__(self):
-        return f"{self.street_name or 'Address'} - {self.city or ''}"
+        if self.street_name:
+            return f"{self.street_name}, {self.city or ''} (User #{self.user_id})"
+        return f"Address #{self.id} (User #{self.user_id})"
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(null=True, blank=True)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
-    category = models.ForeignKey(CategoryType, on_delete=models.DO_NOTHING)
-    brand = models.ForeignKey(Brand, on_delete=models.DO_NOTHING)
-    price = models.DecimalField(max_digits=18, decimal_places=2)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=200, db_column='Name')
+    description = models.TextField(db_column='Description', blank=True, null=True)
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId')
+    category = models.ForeignKey(CategoryType, models.DO_NOTHING, db_column='CategoryId')
+    brand = models.ForeignKey(Brand, models.DO_NOTHING, db_column='BrandId')
+    price = models.DecimalField(max_digits=18, decimal_places=2, db_column='Price')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Product'
+        indexes = [
+            models.Index(fields=['status'], name='idx_product_status'),
+            models.Index(fields=['category'], name='idx_product_category'),
+            models.Index(fields=['brand'], name='idx_product_brand'),
+        ]
 
     def __str__(self):
         return self.name
 
 
+class ProductDocument(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey(Product, models.DO_NOTHING, db_column='ProductId', blank=True, null=True)
+    file_path = models.CharField(max_length=500, db_column='FilePath')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ProductDocument'
+
+    def __str__(self):
+        return self.file_path
+
+
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    sku = models.CharField(max_length=100, unique=True)
-    attributes = models.JSONField(null=True, blank=True)  # Django >= 3.1
-    price = models.DecimalField(max_digits=18, decimal_places=3)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey(Product, models.DO_NOTHING, db_column='ProductId')
+    sku = models.CharField(max_length=100, db_column='SKU', unique=True, blank=True, null=True)
+    attributes = models.JSONField(db_column='Attributes', blank=True, null=True)
+    price = models.DecimalField(max_digits=18, decimal_places=3, db_column='Price')
 
     class Meta:
         managed = False
         db_table = 'ProductVariant'
+        indexes = [
+            models.Index(fields=['product'], name='idx_productvariant_product'),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['sku'], name='uq_productvariant_sku'),
+        ]
 
     def __str__(self):
-        return self.sku or f"Variant of {self.product}"
+        return self.sku or f"Variant {self.id} of Product #{self.product_id}"
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey(Users, models.DO_NOTHING, db_column='UserId')
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Cart'
+        indexes = [
+            models.Index(fields=['user'], name='idx_cart_user'),
+            models.Index(fields=['status'], name='idx_cart_status'),
+        ]
 
     def __str__(self):
-        return f"Cart {self.id} - User {self.user_id}"
+        return f"Cart #{self.id} (User #{self.user_id})"
 
 
 class CartItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    cart = models.ForeignKey(Cart, on_delete=models.DO_NOTHING)
-    quantity = models.BigIntegerField(default=1)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey(Product, models.DO_NOTHING, db_column='ProductId')
+    cart = models.ForeignKey(Cart, models.DO_NOTHING, db_column='CartId')
+    quantity = models.BigIntegerField(db_column='Quantity', default=1)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'CartItem'
+        indexes = [
+            models.Index(fields=['cart'], name='idx_cartitem_cart'),
+            models.Index(fields=['product'], name='idx_cartitem_product'),
+            models.Index(fields=['cart', 'product'], name='idx_cartitem_cart_product'),
+        ]
 
     def __str__(self):
-        return f"{self.product.name} x {self.quantity}"
+        # use product name if available but avoid extra DB join by using product_id when necessary
+        try:
+            return f"{self.product.name} x {self.quantity} (Cart #{self.cart_id})"
+        except Exception:
+            return f"Product #{self.product_id} x {self.quantity} (Cart #{self.cart_id})"
 
 
 class Orders(models.Model):
-    user = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
-    cart = models.ForeignKey(Cart, on_delete=models.DO_NOTHING, null=True, blank=True)
-    amount = models.DecimalField(max_digits=18, decimal_places=3)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey(Users, models.DO_NOTHING, db_column='UserId')
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId')
+    cart = models.ForeignKey(Cart, models.DO_NOTHING, db_column='CartId', blank=True, null=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=3, db_column='Amount')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Orders'
+        indexes = [
+            models.Index(fields=['user'], name='idx_orders_user'),
+            models.Index(fields=['status'], name='idx_orders_status'),
+            models.Index(fields=['cart'], name='idx_orders_cart'),
+            models.Index(fields=['user', 'status'], name='idx_orders_user_status'),
+        ]
 
     def __str__(self):
-        return f"Order {self.id} - User {self.user_id}"
+        return f"Order {self.id} - User {self.user_id} - Amount {self.amount}"
 
 
 class Transactions(models.Model):
-    payment_mode = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING)
-    order = models.ForeignKey(Orders, on_delete=models.DO_NOTHING, null=True, blank=True)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING, null=True, blank=True)
-    amount = models.DecimalField(max_digits=18, decimal_places=3, null=True, blank=True)
-    currency = models.ForeignKey(Currency, on_delete=models.DO_NOTHING, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    payment_mode = models.ForeignKey(PaymentMethod, models.DO_NOTHING, db_column='PaymentModeId')
+    order = models.ForeignKey(Orders, models.DO_NOTHING, db_column='OrderId', blank=True, null=True)
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId', blank=True, null=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=3, db_column='Amount', blank=True, null=True)
+    currency = models.ForeignKey(Currency, models.DO_NOTHING, db_column='CurrencyId', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Transactions'
+        indexes = [
+            models.Index(fields=['order'], name='idx_transactions_ord'),
+            models.Index(fields=['payment_mode'], name='idx_transactions_payment'),
+            models.Index(fields=['status'], name='idx_transactions_status'),
+            models.Index(fields=['currency'], name='idx_transactions_currency'),
+            models.Index(fields=['order', 'status'], name='idx_transactions_order_status'),
+        ]
 
     def __str__(self):
-        return f"Transaction {self.id} - Amount {self.amount}"
+        return f"Transaction {self.id} - Order {self.order_id} - Amount {self.amount}"
 
 
+class OrderStatusHistory(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    order = models.ForeignKey(Orders, models.DO_NOTHING, db_column='OrderId')
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId')
+    changed_date = models.DateTimeField(db_column='ChangedDate', blank=True, null=True)
+    changed_by = models.BigIntegerField(db_column='ChangedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
-# ------------------ WAREHOUSE & INVENTORY ------------------
+    class Meta:
+        managed = False
+        db_table = 'OrderStatusHistory'
+
+    def __str__(self):
+        return f"OrderHistory #{self.id} - Order {self.order_id} -> Status {self.status_id}"
+
+
+class SavedItem(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey(Product, models.DO_NOTHING, db_column='ProductId')
+    user = models.ForeignKey(Users, models.DO_NOTHING, db_column='UserId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SavedItem'
+
+    def __str__(self):
+        return f"SavedItem #{self.id} - User {self.user_id} saved Product {self.product_id}"
+
+
+class Review(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey(Product, models.DO_NOTHING, db_column='ProductId')
+    user = models.ForeignKey(Users, models.DO_NOTHING, db_column='UserId')
+    rating = models.IntegerField(db_column='Rating', blank=True, null=True)
+    subject = models.CharField(max_length=200, db_column='Subject', blank=True, null=True)
+    message = models.TextField(db_column='Message', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Review'
+        constraints = [
+            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name='ck_review_rating_1_5'),
+        ]
+
+    def __str__(self):
+        return f"Review #{self.id} - Product {self.product_id} - Rating {self.rating}"
+
 
 class Warehouse(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name', blank=True, null=True)
+    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='AddressId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -400,27 +552,33 @@ class Warehouse(models.Model):
 
 
 class WarehouseStock(models.Model):
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING)
-    product_variant = models.ForeignKey(ProductVariant, on_delete=models.DO_NOTHING)
-    quantity = models.IntegerField()
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    warehouse = models.ForeignKey(Warehouse, models.DO_NOTHING, db_column='WarehouseId')
+    product_variant = models.ForeignKey(ProductVariant, models.DO_NOTHING, db_column='ProductVariantId')
+    quantity = models.IntegerField(db_column='Quantity')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'WarehouseStock'
+        indexes = [
+            models.Index(fields=['warehouse'], name='idx_warehousestock_wh'),
+            models.Index(fields=['product_variant'], name='idx_warehousestock_variant'),
+        ]
 
     def __str__(self):
-        return f"{self.product_variant} in {self.warehouse}"
+        return f"Stock: Variant {self.product_variant_id} @ Warehouse {self.warehouse_id} = {self.quantity}"
 
 
 class InventoryActionType(models.Model):
-    code = models.CharField(max_length=5, unique=True)
-    name = models.CharField(max_length=50)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    code = models.CharField(max_length=5, db_column='Code', unique=True)
+    name = models.CharField(max_length=50, db_column='Name')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -431,84 +589,87 @@ class InventoryActionType(models.Model):
 
 
 class Reason(models.Model):
-    code = models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=255)
-    action_type = models.ForeignKey(InventoryActionType, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    code = models.CharField(max_length=50, db_column='Code', unique=True)
+    description = models.CharField(max_length=255, db_column='Description')
+    action_type = models.ForeignKey(InventoryActionType, models.DO_NOTHING, db_column='ActionTypeId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Reason'
+        indexes = [
+            models.Index(fields=['action_type'], name='idx_inventorytransaction_reason'),
+        ]
 
     def __str__(self):
         return self.description
 
 
 class InventoryTransaction(models.Model):
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING)
-    product_variant = models.ForeignKey(ProductVariant, on_delete=models.DO_NOTHING)
-    quantity_change = models.IntegerField()
-    reason = models.ForeignKey(Reason, on_delete=models.DO_NOTHING)
-    reference_id = models.BigIntegerField(null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    warehouse = models.ForeignKey(Warehouse, models.DO_NOTHING, db_column='WarehouseId')
+    product_variant = models.ForeignKey(ProductVariant, models.DO_NOTHING, db_column='ProductVariantId')
+    quantity_change = models.IntegerField(db_column='QuantityChange')
+    reason = models.ForeignKey(Reason, models.DO_NOTHING, db_column='ReasonId')
+    reference_id = models.BigIntegerField(db_column='ReferenceId', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'InventoryTransaction'
+        indexes = [
+            models.Index(fields=['warehouse'], name='idx_inventorytransaction_wh'),
+            models.Index(fields=['product_variant'], name='idx_inventorytransaction_variant'),
+            models.Index(fields=['warehouse', 'product_variant'], name='idx_inventory_wh_variant'),
+        ]
         constraints = [
-            models.CheckConstraint(check=~models.Q(quantity_change=0), name='quantity_change_non_zero')
+            models.CheckConstraint(check=~models.Q(quantity_change=0), name='ck_inventory_qty_change_nonzero'),
         ]
 
     def __str__(self):
-        return f"{self.quantity_change} - {self.product_variant}"
-
-
-# ------------------ DELIVERY ------------------
-
-class DeliveryMode(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'DeliveryMode'
-
-    def __str__(self):
-        return self.name
+        return f"InvTx #{self.id}: Variant {self.product_variant_id} @ Wh {self.warehouse_id} -> {self.quantity_change}"
 
 
 class Delivery(models.Model):
-    tracking_number = models.CharField(max_length=50)
-    delivery_mode = models.ForeignKey(DeliveryMode, on_delete=models.DO_NOTHING)
-    order = models.ForeignKey(Orders, on_delete=models.DO_NOTHING)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING)
-    dispatch_date = models.DateTimeField(null=True, blank=True)
-    delivery_date = models.DateTimeField(null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    tracking_number = models.CharField(max_length=50, db_column='TrackingNumber')
+    delivery_mode = models.ForeignKey(DeliveryMode, models.DO_NOTHING, db_column='DeliveryModeId')
+    order = models.ForeignKey(Orders, models.DO_NOTHING, db_column='OrderId')
+    status = models.ForeignKey(Status, models.DO_NOTHING, db_column='StatusId')
+    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='AddressId')
+    dispatch_date = models.DateTimeField(db_column='DispatchDate', blank=True, null=True)
+    delivery_date = models.DateTimeField(db_column='DeliveryDate', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Delivery'
+        indexes = [
+            models.Index(fields=['order'], name='idx_delivery_order'),
+            models.Index(fields=['status'], name='idx_delivery_status'),
+            models.Index(fields=['delivery_mode'], name='idx_delivery_mode'),
+            models.Index(fields=['address'], name='idx_delivery_address'),
+        ]
 
     def __str__(self):
-        return self.tracking_number
+        return f"Delivery {self.tracking_number} (Order #{self.order_id})"
 
 
 class PickupStation(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.DO_NOTHING)
-    is_warehouse = models.BooleanField(default=False)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name', blank=True, null=True)
+    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='AddressId')
+    is_warehouse = models.BooleanField(db_column='IsWarehouse', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -518,116 +679,20 @@ class PickupStation(models.Model):
         return self.name or f"PickupStation {self.id}"
 
 
-# ------------------ NOTIFICATIONS ------------------
-
-class NotificationType(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'NotificationType'
-
-    def __str__(self):
-        return self.name
-
-
-class NotificationTemplate(models.Model):
-    message = models.TextField()
-    subject = models.CharField(max_length=200, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'NotificationTemplate'
-
-    def __str__(self):
-        return self.subject or f"Template {self.id}"
-
-
-class Sender(models.Model):
-    sender_address = models.CharField(max_length=255)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'Sender'
-
-    def __str__(self):
-        return self.sender_address
-
-
 class Notification(models.Model):
-    notification_type = models.ForeignKey(NotificationType, on_delete=models.DO_NOTHING)
-    notification_template = models.ForeignKey(NotificationTemplate, on_delete=models.DO_NOTHING)
-    message = models.TextField(null=True, blank=True)
-    subject = models.CharField(max_length=300, null=True, blank=True)
-    sender = models.ForeignKey(Sender, on_delete=models.DO_NOTHING)
-    recipient = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    notification_type = models.ForeignKey(NotificationType, models.DO_NOTHING, db_column='NotificationTypeId')
+    notification_template = models.ForeignKey(NotificationTemplate, models.DO_NOTHING, db_column='NotificationTemplateId')
+    message = models.TextField(db_column='Message', blank=True, null=True)
+    subject = models.CharField(max_length=300, db_column='Subject', blank=True, null=True)
+    sender = models.ForeignKey(Sender, models.DO_NOTHING, db_column='SenderId')
+    recipient = models.ForeignKey(Users, models.DO_NOTHING, db_column='Recipient')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Notification'
 
     def __str__(self):
-        return self.subject or f"Notification {self.id}"
-
-# ------------------ ORDER HISTORY & USER INTERACTIONS ------------------
-
-class OrderStatusHistory(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.DO_NOTHING)
-    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
-    changed_date = models.DateTimeField(auto_now_add=True)
-    changed_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'OrderStatusHistory'
-
-    def __str__(self):
-        return f"Order {self.order.id} - Status {self.status}"
-
-
-class SavedItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    user = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    updated_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'SavedItem'
-
-    def __str__(self):
-        return f"{self.user} saved {self.product}"
-
-
-class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    user = models.ForeignKey(Users, on_delete=models.DO_NOTHING)
-    rating = models.IntegerField()
-    subject = models.CharField(max_length=200, null=True, blank=True)
-    message = models.TextField(null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.BigIntegerField(null=True, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'Review'
-        constraints = [
-            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5),
-                                   name='rating_range_1_5')
-        ]
-
-    def __str__(self):
-        return f"{self.user} - {self.product} ({self.rating})"
+        return self.subject or f"Notification #{self.id}"

@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from datetime import datetime, date
+from backend.models import *
 
-from backend.models import Product, Review, Customer, Order
 from . import forms
 
 
@@ -15,7 +15,7 @@ from . import forms
 
 # FOR DISPLAYING THE PRODUCTS ON THE HOME PAGE
 def home(request):
-    products = Product.objects.filter(product_status=1).order_by('-date_created')[:10]  # Display only active products
+    products = Product.objects.filter(status=1).order_by('-created_date')[:10]  # Display only active products
   
     
     context = {
@@ -27,7 +27,7 @@ def home(request):
 @login_required(login_url="login")
 def account_detail(request):
     try:
-        addresses = ShippingAddress.objects.filter(customer=request.user)
+        addresses = Address.objects.filter(customer=request.user)
         # print(addresses)
         context = {
             
@@ -89,7 +89,7 @@ def edit_category(request, id):
 
  
 def all_category(request):
-    categories = Category.objects.all()
+    categories = CategoryType.objects.all()
     context = {'categories': categories}
     return render(request, 'all_category.html', context)
 
@@ -100,14 +100,14 @@ def category_context(request):
 
  
 def category_detail(request, id):
-    category = Category.objects.get(id=id)
+    category = CategoryType.objects.get(id=id)
     products = category.products.all()
     context = {'category': category, 'products': products}
     return render(request, 'category_detail.html', context)
 
 @login_required(login_url="login") 
 def delete_category(request, id):
-    category = Category.objects.get(id=id)
+    category = CategoryType.objects.get(id=id)
     if not (request.user.is_superuser or category.creator == request.user):
         messages.error(request, 'You are not authorized to edit this category.')
         return redirect('all_category')

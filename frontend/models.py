@@ -1,166 +1,235 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
-#
-#
-# class Customer(models.Model):
-#     USER_TYPE_CHOICES = [
-#         ('buyer', 'Buyer'),
-#         ('seller', 'Seller'),
-#     ]
-#     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=200, null=True)
-#     email = models.CharField(max_length=200)
-#     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='buyer')
-#
-#     def __str__(self):
-#         return self.name
-#
-#
-# class SavedProducts(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     product = models.ForeignKey("backend.Product", on_delete=models.CASCADE)
-#     created_date = models.DateTimeField(auto_now_add=True)
-#
-#     class Meta:
-#         unique_together = ('user', 'product')
-#         indexes = [
-#             models.Index(fields=['user', 'product']),
-#         ]
-#
-#     def __str__(self):
-#         return f"{self.user.username} saved {self.product.name}"
-#
-#
-# class Review(models.Model):
-#     product = models.ForeignKey("backend.Product", on_delete=models.CASCADE)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-#     title = models.CharField(max_length=255)
-#     message = models.TextField()
-#     created_date = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return f"{self.user.username} - {self.product.name} ({self.rating} stars)"
-#
-#
-# # ---------------- CART & ORDERS ----------------
-#
-# class Cart(models.Model):
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     complete = models.BooleanField(default=False)
-#     customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True, blank=True)
-#
-#     @property
-#     def cart_total_price(self):
-#         return sum(item.item_total_price for item in self.cartitem_set.all())
-#
-#     @property
-#     def cart_total_items(self):
-#         return sum(item.quantity for item in self.cartitem_set.all())
-#
-#     def __str__(self):
-#         return f'Cart {self.id} - Customer: {self.customer.name if self.customer else "No Customer"}'
-#
-#
-# class CartItem(models.Model):
-#     product = models.ForeignKey("backend.Product", on_delete=models.CASCADE, null=True)
-#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
-#     quantity = models.IntegerField(default=0, null=True)
-#
-#     @property
-#     def item_total_price(self):
-#         return self.product.price * self.quantity
-#
-#     def __str__(self):
-#         return f'CartItem for {self.cart}'
-#
-#
-# class ShippingAddress(models.Model):
-#     customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-#     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True)
-#     address = models.CharField(max_length=200)
-#     city = models.CharField(max_length=200)
-#     region = models.CharField(max_length=200)
-#     phone = models.CharField(max_length=200)
-#     date_added = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return f'{self.customer} address is {self.address}'
-#
-#
-# class API(models.Model):
-#     name = models.CharField(max_length=100, null=True, blank=True)
-#     key = models.CharField(max_length=200, null=True, blank=True)
-#     date_added = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return self.name
-#
-#
-# class PaymentMethod(models.Model):
-#     method = models.CharField(max_length=100, null=True)
-#     APIkey = models.ForeignKey(API, on_delete=models.SET_NULL, null=True)
-#     date_added = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return self.method
-#
-#
-# class Transaction(models.Model):
-#     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-#     amount = models.IntegerField()  # in pesewas
-#     reference = models.CharField(max_length=100, unique=True)
-#     verified = models.BooleanField(default=False)
-#     date_added = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return f"{self.customer} - {self.amount / 100} GHS"
-#
-#
-# class OrderStatus(models.Model):
-#     status = models.CharField(max_length=50, unique=True)
-#     created_date = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return self.status
-#
-#
-# class Order(models.Model):
-#     cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
-#     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-#     payment = models.ForeignKey(Transaction, on_delete=models.SET_NULL, null=True)
-#     shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, null=True, blank=True)
-#     status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#
-#     @property
-#     def total_price(self):
-#         return self.cart.cart_total_price
-#
-#     @property
-#     def total_items(self):
-#         return self.cart.cart_total_items
-#
-#     def __str__(self):
-#         return f"Order {self.id} - {self.customer.username} ({self.status})"
-#
-#
-# # ---------------- DELIVERY ----------------
-#
-# class DeliveryMethod(models.Model):
-#     mode = models.CharField(max_length=100, null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#
-#
-# class DeliveryStatus(models.Model):
-#     status = models.CharField(max_length=100, null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#
-#
-# class Delivery(models.Model):
-#     delivery_method = models.ForeignKey(DeliveryMethod, on_delete=models.SET_NULL, null=True, blank=True)
-#     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-#     status = models.ForeignKey(DeliveryStatus, on_delete=models.SET_NULL, null=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
+
+
+# ==
+# REFERENCE TABLES
+# ==
+
+
+
+
+
+class Country(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    country_code = models.CharField(max_length=5, db_column='CountryCode', unique=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Country'
+
+    def __str__(self):
+        return f"{self.name} ({self.country_code})"
+
+
+
+
+class Region(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    name = models.CharField(max_length=100, db_column='Name')
+    region_code = models.CharField(max_length=10, db_column='RegionCode', unique=True, blank=True, null=True)
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='CountryId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Region'
+
+    def __str__(self):
+        return f"{self.name} ({self.region_code})" if self.region_code else self.name
+
+
+
+# =========================
+# MAIN ENTITY TABLES
+# =========================
+
+
+
+class Address(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey('backend.Users', models.DO_NOTHING, db_column='UserId')
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='CountryId')
+    region = models.ForeignKey(Region, models.DO_NOTHING, db_column='RegionId')
+    city = models.CharField(max_length=200, db_column='City', blank=True, null=True)
+    address_type = models.ForeignKey('backend.AddressType', models.DO_NOTHING, db_column='AddressTypeId')
+    digital_address = models.CharField(max_length=100, db_column='DigitalAddress', blank=True, null=True)
+    street_name = models.CharField(max_length=200, db_column='StreetName', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+    is_default = models.BooleanField(db_column='IsDefault', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Address'
+        indexes = [
+            models.Index(fields=['user'], name='idx_address_user'),
+            models.Index(fields=['country'], name='idx_address_country'),
+            models.Index(fields=['region'], name='idx_address_region'),
+            models.Index(fields=['address_type'], name='idx_address_addresstype'),
+        ]
+
+    def __str__(self):
+        if self.street_name:
+            return f"{self.street_name}, {self.city or ''} (User #{self.user_id})"
+        return f"Address #{self.id} (User #{self.user_id})"
+
+
+
+
+
+
+
+
+class Cart(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey('backend.Users', models.DO_NOTHING, db_column='UserId')
+    status = models.ForeignKey('backend.Status', models.DO_NOTHING, db_column='StatusId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Cart'
+        indexes = [
+            models.Index(fields=['user'], name='idx_cart_user'),
+            models.Index(fields=['status'], name='idx_cart_status'),
+        ]
+
+    def __str__(self):
+        return f"Cart #{self.id} (User #{self.user_id})"
+
+
+class CartItem(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey('backend.Product', models.DO_NOTHING, db_column='ProductId')
+    cart = models.ForeignKey(Cart, models.DO_NOTHING, db_column='CartId')
+    quantity = models.BigIntegerField(db_column='Quantity', default=1)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'CartItem'
+        indexes = [
+            models.Index(fields=['cart'], name='idx_cartitem_cart'),
+            models.Index(fields=['product'], name='idx_cartitem_product'),
+            models.Index(fields=['cart', 'product'], name='idx_cartitem_cart_product'),
+        ]
+
+    def __str__(self):
+        # use product name if available but avoid extra DB join by using product_id when necessary
+        try:
+            return f"{self.product.name} x {self.quantity} (Cart #{self.cart_id})"
+        except Exception:
+            return f"Product #{self.product_id} x {self.quantity} (Cart #{self.cart_id})"
+
+
+class Orders(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    user = models.ForeignKey('backend.Users', models.DO_NOTHING, db_column='UserId')
+    status = models.ForeignKey('backend.Status', models.DO_NOTHING, db_column='StatusId')
+    cart = models.ForeignKey(Cart, models.DO_NOTHING, db_column='CartId', blank=True, null=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=3, db_column='Amount')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Orders'
+        indexes = [
+            models.Index(fields=['user'], name='idx_orders_user'),
+            models.Index(fields=['status'], name='idx_orders_status'),
+            models.Index(fields=['cart'], name='idx_orders_cart'),
+            models.Index(fields=['user', 'status'], name='idx_orders_user_status'),
+        ]
+
+    def __str__(self):
+        return f"Order {self.id} - User {self.user_id} - Amount {self.amount}"
+
+
+
+
+
+
+class SavedItem(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey('backend.Product', models.DO_NOTHING, db_column='ProductId')
+    user = models.ForeignKey('backend.Users', models.DO_NOTHING, db_column='UserId')
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'SavedItem'
+
+    def __str__(self):
+        return f"SavedItem #{self.id} - User {self.user_id} saved Product {self.product_id}"
+
+
+class Review(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    product = models.ForeignKey('backend.Product', models.DO_NOTHING, db_column='ProductId')
+    user = models.ForeignKey('backend.Users', models.DO_NOTHING, db_column='UserId')
+    rating = models.IntegerField(db_column='Rating', blank=True, null=True)
+    subject = models.CharField(max_length=200, db_column='Subject', blank=True, null=True)
+    message = models.TextField(db_column='Message', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Review'
+        constraints = [
+            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name='ck_review_rating_1_5'),
+        ]
+
+    def __str__(self):
+        return f"Review #{self.id} - Product {self.product_id} - Rating {self.rating}"
+
+
+
+
+class Delivery(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='Id')
+    tracking_number = models.CharField(max_length=50, db_column='TrackingNumber')
+    delivery_mode = models.ForeignKey('backend.DeliveryMode', models.DO_NOTHING, db_column='DeliveryModeId')
+    order = models.ForeignKey(Orders, models.DO_NOTHING, db_column='OrderId')
+    status = models.ForeignKey('backend.Status', models.DO_NOTHING, db_column='StatusId')
+    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='AddressId')
+    dispatch_date = models.DateTimeField(db_column='DispatchDate', blank=True, null=True)
+    delivery_date = models.DateTimeField(db_column='DeliveryDate', blank=True, null=True)
+    created_date = models.DateTimeField(db_column='CreatedDate', blank=True, null=True)
+    created_by = models.BigIntegerField(db_column='CreatedBy', blank=True, null=True)
+    updated_date = models.DateTimeField(db_column='UpdatedDate', blank=True, null=True)
+    updated_by = models.BigIntegerField(db_column='UpdatedBy', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Delivery'
+        indexes = [
+            models.Index(fields=['order'], name='idx_delivery_order'),
+            models.Index(fields=['status'], name='idx_delivery_status'),
+            models.Index(fields=['delivery_mode'], name='idx_delivery_mode'),
+            models.Index(fields=['address'], name='idx_delivery_address'),
+        ]
+
+    def __str__(self):
+        return f"Delivery {self.tracking_number} (Order #{self.order_id})"
+
+
