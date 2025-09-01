@@ -3,7 +3,12 @@ from django.contrib import messages
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+
+# from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
 from datetime import datetime, date
 from backend.models import Product
 
@@ -27,7 +32,7 @@ def home(request):
 @login_required(login_url="login")
 def account_detail(request):
     try:
-        addresses = Address.objects.filter(customer=request.user)
+        addresses = Address.objects.filter(User=request.user)
         # print(addresses)
         context = {
             
@@ -39,11 +44,11 @@ def account_detail(request):
 
 
 
-    
+
 
 # CATEGORY FUNCTIONS
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_category(request):
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to create a category.')
@@ -64,7 +69,7 @@ def create_category(request):
     context = {'form': form}
     return render(request, 'create_category.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def edit_category(request, id):
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to edit a category.')
@@ -140,7 +145,7 @@ def create_brand(request):
 
 
 # PRODUCT FUNCTIONS
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_product(request):
     if not (request.user.is_superuser or (hasattr(request.user, 'customer') and request.user.customer.user_type == 'seller')):
         messages.error(request, 'You must be a seller to create a product.')
@@ -156,7 +161,7 @@ def create_product(request):
             return redirect('home')
     else:
         form = ProductForm()
-        
+
 
     context = {'form': form}
     return render(request, 'create_product.html', context)
@@ -423,7 +428,7 @@ def shipping_address(request):
             #messages.error(request, 'All fields are required.')
             return redirect('shipping_address')
 
-        ShippingAddress.objects.update_or_create(
+        Address.objects.update_or_create(
             customer=request.user,
             cart=cart,
             defaults={
@@ -446,7 +451,7 @@ def shipping_address(request):
 def edit_address(request, id):
     print("Edit address view function called")
     try:
-        address = ShippingAddress.objects.get(id=id)
+        address = Address.objects.get(id=id)
         print(f"Address customer: {address.customer}, Request user: {request.user}")
         if address.customer != request.user:
             print("Customer and user do not match")
@@ -459,7 +464,7 @@ def edit_address(request, id):
                 form.save()
                 return redirect('account_detail')
         else:
-            form = ShippingAddressForm(instance=address)
+            form = AddressForm(instance=address)
 
         context = {'address': address, 'form': form}
         return render(request, 'edit_address.html', context)
@@ -499,7 +504,7 @@ def customer_detail(request, id):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -508,9 +513,6 @@ def register(request):
             messages.error(request, 'Passwords do not match!')
             return redirect('register')
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-            return redirect('register')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered')
@@ -520,8 +522,8 @@ def register(request):
             messages.error(request, 'Invalid email address')
             return redirect('register')
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        customer = Customer.objects.create(user=user, name=username, email=email)
+        user = User.objects.create_user(username=email, email=email, password=password)
+        # customer = Customer.objects.create(user=user, name=username, email=email)
 
         return redirect('login')
 
@@ -552,14 +554,6 @@ def orders(request):
     carts = Cart.objects.all()
     context = {'carts': carts}
     return render(request, 'orders.html', context)
-
-
-
-
-
-
-
-
 
 
 def payment_success(request):

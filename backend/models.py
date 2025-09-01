@@ -1,12 +1,21 @@
 from django.db import models
 # from frontend.models import Orders
-from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import JSONField  # or use models.JSONField for Django 3.1+
+from django.conf import settings
+
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
 
 # ==
 # REFERENCE TABLES
 # ==
+
+# User = get_user_model()
 
 class User(AbstractUser):
     USER_TYPES = (

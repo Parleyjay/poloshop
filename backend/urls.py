@@ -59,7 +59,7 @@ urlpatterns = [
     path('order/complete/', views.completed_order_view, name='orders_complete'),
 
 
-    #CUSTOMER URLS
+    #STAFF/ADMIN URLS
     path('register/', views.register, name='register'),
     path('staff_login/', views.staff_login, name='login'),
 
@@ -71,7 +71,16 @@ urlpatterns = [
     
     
     path('edit_address/<int:id>/', views.edit_address, name='edit_address'),
-    
+
+
+
+    # path('login/', views.backend_login, name='backend_login'),
+
+    # FOR VARIOUS STAFF LEVEL LOGINS
+    # path('staff/dashboard/', staffviews.dashboard, name='staff_dashboard'),
+    # path('admin/dashboard/', adminviews.dashboard, name='admin_dashboard'),
+
+
 
 
 

@@ -3,9 +3,11 @@ from django.contrib import messages
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from datetime import datetime, date
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 from . import forms
 
@@ -24,7 +26,7 @@ from . import forms
 @login_required(login_url="login")
 def account_detail(request):
     try:
-        addresses = Address.objects.filter(customer=request.user)
+        addresses = Address.objects.filter(User=request.user)
         # print(addresses)
         context = {
 
@@ -67,7 +69,7 @@ def edit_category(request, id):
         messages.error(request, 'You must be logged in to edit a category.')
         return redirect('login')
 
-    category = Category.objects.get(id=id)
+    category = CategoryType.objects.get(id=id)
 
     if not (request.user.is_superuser or category.creator == request.user):
         messages.error(request, 'You are not authorized to edit this category.')
@@ -93,18 +95,18 @@ def all_category(request):
 
 @login_required(login_url="login")
 def category_context(request):
-    return {'categories': Category.objects.all()}
+    return {'categories': CategoryType.objects.all()}
 
 
 def category_detail(request, id):
-    category = Category.objects.get(id=id)
+    category = CategoryType.objects.get(id=id)
     products = category.products.all()
     context = {'category': category, 'products': products}
     return render(request, 'category_detail.html', context)
 
 @login_required(login_url="login")
 def delete_category(request, id):
-    category = Category.objects.get(id=id)
+    category = CategoryType.objects.get(id=id)
     if not (request.user.is_superuser or category.creator == request.user):
         messages.error(request, 'You are not authorized to edit this category.')
         return redirect('all_category')
@@ -496,7 +498,7 @@ def customer_detail(request, id):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        # username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -505,9 +507,9 @@ def register(request):
             messages.error(request, 'Passwords do not match!')
             return redirect('register')
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-            return redirect('register')
+        # if User.objects.filter(username=username).exists():
+        #     messages.error(request, 'Username already exists')
+        #     return redirect('register')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered')
@@ -517,8 +519,8 @@ def register(request):
             messages.error(request, 'Invalid email address')
             return redirect('register')
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        customer = Customer.objects.create(user=user, name=username, email=email)
+        user = User.objects.create_user(username=email, email=email, password=password)
+        # customer = Customer.objects.create(user=user, name=username, email=email)
 
         return redirect('login')
 

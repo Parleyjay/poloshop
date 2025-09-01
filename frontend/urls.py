@@ -39,4 +39,15 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('account/', views.account_detail, name='account_detail'),
+
+
+    # path('customer/dashboard/', customerviews.dashboard, name='customer_dashboard'),
+
+    # FOR VENDORS
+    # path('vendor/dashboard/', vendorviews.dashboard, name='vendor_dashboard'),
+
+
+
+
+
 ]
