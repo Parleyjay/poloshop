@@ -1,12 +1,22 @@
 from django.db import models
 # from frontend.models import Orders
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.fields import JSONField  # or use models.JSONField for Django 3.1+
 
 # ==
 # REFERENCE TABLES
 # ==
+
+class User(AbstractUser):
+    USER_TYPES = (
+        ('customer', 'Customer'),
+        ('vendor', 'Vendor'),
+        ('staff', 'Staff'),
+        ('admin', 'Admin'),
+    )
+    user_type = models.CharField(max_length=20, choices=USER_TYPES)
+
 
 class UserType(models.Model):
     id = models.BigAutoField(primary_key=True, db_column='Id')

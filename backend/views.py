@@ -24,10 +24,10 @@ from . import forms
 @login_required(login_url="login")
 def account_detail(request):
     try:
-        addresses = ShippingAddress.objects.filter(customer=request.user)
+        addresses = Address.objects.filter(customer=request.user)
         # print(addresses)
         context = {
-            
+
             "addresses": addresses,
         }
         return render(request, 'account_detail.html', context)
@@ -36,11 +36,11 @@ def account_detail(request):
 
 
 
-    
+
 
 # CATEGORY FUNCTIONS
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_category(request):
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to create a category.')
@@ -61,7 +61,7 @@ def create_category(request):
     context = {'form': form}
     return render(request, 'create_category.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def edit_category(request, id):
     if not request.user.is_authenticated:
         messages.error(request, 'You must be logged in to edit a category.')
@@ -84,25 +84,25 @@ def edit_category(request, id):
     context = {'category': category, 'form': form}
     return render(request, 'edit_category.html', context)
 
- 
+
 def all_category(request):
-    categories = Category.objects.all()
+    categories = CategoryType.objects.all()
     context = {'categories': categories}
     return render(request, 'all_category.html', context)
 
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def category_context(request):
     return {'categories': Category.objects.all()}
 
- 
+
 def category_detail(request, id):
     category = Category.objects.get(id=id)
     products = category.products.all()
     context = {'category': category, 'products': products}
     return render(request, 'category_detail.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def delete_category(request, id):
     category = Category.objects.get(id=id)
     if not (request.user.is_superuser or category.creator == request.user):
@@ -120,14 +120,14 @@ def delete_category(request, id):
 
 
 #!!!!!!!!!!!!!!!!!!!! BRAND !!!!!!!!!!!!!!!!!!!
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_brand(request):
     if request.method == 'POST':
         form = BrandForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('create_product')
-    
+
     else:
         form = BrandForm()
 
@@ -137,7 +137,7 @@ def create_brand(request):
 
 
 # PRODUCT FUNCTIONS
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_product(request):
     if not (request.user.is_superuser or (hasattr(request.user, 'customer') and request.user.customer.user_type == 'seller')):
         messages.error(request, 'You must be a seller to create a product.')
@@ -153,7 +153,7 @@ def create_product(request):
             return redirect('home')
     else:
         form = ProductForm()
-        
+
 
     context = {'form': form}
     return render(request, 'create_product.html', context)
@@ -165,7 +165,7 @@ def product_detail(request, id):
     context = {'product': product, 'reviews': reviews}
     return render(request, 'product_detail.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def edit_product(request, id):
     product = Product.objects.get(id=id)
     if not (request.user.is_superuser or product.creator == request.user):
@@ -183,7 +183,7 @@ def edit_product(request, id):
     context = {'product': product, 'form': form}
     return render(request, 'edit_product.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def delete_product(request, id):
     product = Product.objects.get(id=id)
     if not (request.user.is_superuser or product.creator == request.user):
@@ -201,7 +201,7 @@ def delete_product(request, id):
 
 
 #INVENTORY FUNCTION
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def create_inventory(request):
     if request.method == 'POST':
         form = InventoryForm(request.POST)
@@ -211,17 +211,17 @@ def create_inventory(request):
             inventory.save()
             messages.success(request, 'Inventory updated succesful')
             return redirect('home')
-        
+
     else:
         form = InventoryForm(request.POST)
-    
+
     context = {'form':form}
     return render(request, 'create_inventory.html', context)
 
 
 
 # ADD SAVED PRODUCT
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def add_savedproduct(request, id):
     product = get_object_or_404(Product, id=id)
     saved, created = SavedProducts.objects.get_or_create(user=request.user, product=product)
@@ -235,7 +235,7 @@ def add_savedproduct(request, id):
 
 
 # SAVED PRODUCTS LIST
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def saved_products_list(request):
     saved_products = SavedProducts.objects.filter(user=request.user).select_related('product')
     context = {'saved_products': saved_products}
@@ -243,7 +243,7 @@ def saved_products_list(request):
 
 
 # REMOVE SAVED PRODUCT
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def remove_savedproduct(request, id):
     product = get_object_or_404(Product, id=id)
     SavedProducts.objects.filter(user=request.user, product=product).delete()
@@ -253,10 +253,10 @@ def remove_savedproduct(request, id):
 
 
 # REVIEW FUNCTION
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def add_review(request, id):
     product = get_object_or_404(Product, id=id)
-    
+
     # Prevent multiple reviews by the same user
     if Review.objects.filter(product=product, user=request.user).exists():
         messages.info(request, "You have already reviewed this product.")
@@ -273,12 +273,12 @@ def add_review(request, id):
             return redirect('product_detail', id=id)
     else:
         form = ReviewForm()
-            
-        
+
+
     context = {'form':form, 'product':product}
     return render(request, 'add_review.html', context)
 
-@login_required(login_url="login") 
+@login_required(login_url="login")
 def remove_review(request, id):
     if request.method == 'POST':
         review = get_object_or_404(Review, id=id, user=request.user)
@@ -381,7 +381,7 @@ def checkout(request):
         if not cart:
             cart = Cart.objects.create(customer=customer, complete=False)
         items = CartItem.objects.select_related('product').filter(cart=cart)
-        shipping_address = ShippingAddress.objects.filter(customer=request.user, cart=cart).first()
+        shipping_address = Address.objects.filter(customer=request.user, cart=cart).first()
     else:
         messages.error(request, 'Please login.')
         return redirect('login')
@@ -420,7 +420,7 @@ def shipping_address(request):
             #messages.error(request, 'All fields are required.')
             return redirect('shipping_address')
 
-        ShippingAddress.objects.update_or_create(
+        Address.objects.update_or_create(
             customer=request.user,
             cart=cart,
             defaults={
@@ -443,7 +443,7 @@ def shipping_address(request):
 def edit_address(request, id):
     print("Edit address view function called")
     try:
-        address = ShippingAddress.objects.get(id=id)
+        address = Address.objects.get(id=id)
         print(f"Address customer: {address.customer}, Request user: {request.user}")
         if address.customer != request.user:
             print("Customer and user do not match")
@@ -451,12 +451,12 @@ def edit_address(request, id):
             return redirect('account_detail')
 
         if request.method == 'POST':
-            form = ShippingAddressForm(request.POST, instance=address)
+            form = AddressForm(request.POST, instance=address)
             if form.is_valid():
                 form.save()
                 return redirect('account_detail')
         else:
-            form = ShippingAddressForm(instance=address)
+            form = AddressForm(instance=address)
 
         context = {'address': address, 'form': form}
         return render(request, 'edit_address.html', context)
@@ -593,7 +593,7 @@ def completed_order_view(request):
 
 
 def all_orders(request):
-    orders = Order.objects.all().order_by('-created_at')
+    orders = Order.objects.all().order_by('-created_date')
     context = {'orders': orders}
     return render(request, 'orders.html', context)
 
