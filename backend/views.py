@@ -6,6 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.models import User
 from datetime import datetime, date
 from django.contrib.auth import get_user_model
+from frontend.models import Address, Orders
+
+
 
 User = get_user_model()
 
@@ -26,8 +29,8 @@ from . import forms
 @login_required(login_url="login")
 def account_detail(request):
     try:
-        addresses = Address.objects.filter(User=request.user)
-        # print(addresses)
+        addresses = Address.objects.filter(user_id=request.user.id)
+        print(addresses)
         context = {
 
             "addresses": addresses,
@@ -90,6 +93,7 @@ def edit_category(request, id):
 def all_category(request):
     categories = CategoryType.objects.all()
     context = {'categories': categories}
+    print(categories)
     return render(request, 'all_category.html', context)
 
 
@@ -98,11 +102,16 @@ def category_context(request):
     return {'categories': CategoryType.objects.all()}
 
 
+
 def category_detail(request, id):
-    category = CategoryType.objects.get(id=id)
-    products = category.products.all()
-    context = {'category': category, 'products': products}
-    return render(request, 'category_detail.html', context)
+    category = get_object_or_404(CategoryType, id=id)
+    products = category.Product.all()  # Assuming the related_name is 'product'
+
+    context = {'category': category,
+               'products': products}
+
+    return render(request, 'category_detail.html',context)
+
 
 @login_required(login_url="login")
 def delete_category(request, id):
@@ -297,9 +306,9 @@ def cart(request):
         messages.error(request, 'You must be logged in to view the cart.')
         return redirect('login')
 
-    customer = getattr(request.user, 'customer', None)
-    if customer:
-        cart = Cart.objects.filter(customer=customer, complete=False).first()
+    customer = getattr(request.user.user_type, 1, None)
+    if request.user.user_type == 1:
+        cart = Cart.objects.filter(user=customer, complete=False).first()
         if not cart:
             cart = Cart.objects.create(customer=customer, complete=False)
         items = CartItem.objects.select_related('product').filter(cart=cart)
@@ -407,7 +416,7 @@ def shipping_address(request):
         messages.error(request, 'Customer profile not found.')
         return redirect('login')
 
-    cart = Cart.objects.filter(customer=customer, complete=False).first()
+    cart = Cart.objects.filter(request.user.user_type==1, status==14).first()
     if not cart:
         messages.error(request, 'No active cart found.')
         return redirect('cart')
@@ -578,7 +587,7 @@ def completed_order_view(request):
         return redirect('login')
 
     # Get the latest order for this user
-    order = Order.objects.filter(customer=request.user).order_by('-id').first()
+    order = Orders.objects.filter(user=request.user.id).order_by('-id').first()
     if not order:
         messages.info(request, 'You have no completed orders.')
         return render(request, 'orders_complete.html', {'order': None})

@@ -12,7 +12,8 @@
         {% for category in categories %}
             <div class="col-md-4 mb-3">
                 <div class="card shadow-sm p-3">
-                    <h5 class="card-title">{{ category.Category }}</h5>
+                    <h5 class="card-title">{{ category }}</h5>
+
                     <a href="{% url 'category_detail' id=category.id %}" class="btn btn-outline-primary btn-sm">View Products</a>
                 </div>
             </div>

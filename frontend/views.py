@@ -245,7 +245,7 @@ def add_savedproduct(request, id):
 # SAVED PRODUCTS LIST
 @login_required(login_url="login") 
 def saved_products_list(request):
-    saved_products = SavedProducts.objects.filter(user=request.user).select_related('product')
+    saved_products = SavedItem.objects.filter(user=request.user.id).select_related('product')
     context = {'saved_products': saved_products}
     return render(request, 'saved_products.html', context)
 

@@ -62,7 +62,7 @@
           <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
         </li>
         {% if request.user.is_authenticated %}
-        {% if request.user.is_superuser or request.user.customer.user_type == 'seller' %}
+        {% if request.user.is_superuser or request.user.customer.user_type == '' %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'create_product' %}">Create Product</a>
         </li>
@@ -131,12 +131,12 @@
        <!-- User greeting message -->
   {% if user.is_authenticated and customer %}
   <a class="navbar-brand text-light font-weight-bold" href="{% url 'customer_detail' id=customer.id %}">
-    <i class="fas fa-user-circle"></i> {{ user.username }}
+    <i class="fas fa-user-circle"></i> {{ user.first_name }}
   </a>
 
   {% elif user.is_authenticated%}
   <a class="navbar-brand text-light font-weight-bold" href="{% url 'account_detail'%}">
-    <i class="fas fa-user-circle"></i> {{ user.username }}
+    <i class="fas fa-user-circle"></i> {{ user.first_name }}
   </a>
 
 {% else %}
